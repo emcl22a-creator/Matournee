@@ -55,14 +55,11 @@
   .subtitle{ color:var(--muted); font-size:15px; margin:0 0 18px; }
 
   /* carte stats (Durée / Distance) */
-  .statbar{ display:flex; gap:12px; background:#121214; border:1px solid rgba(255,255,255,0.07);
-    border-radius:var(--rl); padding:16px; margin-bottom:14px; }
-  .statbar .cell{ display:flex; align-items:center; gap:12px; flex:1; }
-  .statbar .cell + .cell{ border-left:1px solid rgba(255,255,255,0.08); padding-left:14px; }
-  .statbar .ico{ width:38px; height:38px; border-radius:10px; border:1px solid rgba(255,255,255,0.12);
-    display:flex; align-items:center; justify-content:center; color:#fff; font-size:18px; flex:none; }
-  .statbar .k{ color:var(--muted); font-size:13px; }
-  .statbar .v{ color:#fff; font-size:19px; font-weight:700; letter-spacing:-0.3px; }
+  .statbar{ display:flex; gap:12px; margin-bottom:14px; }
+  .statbar .cell{ flex:1; background:#121214; border:1px solid rgba(255,255,255,0.07);
+    border-radius:var(--rl); padding:16px 14px; text-align:center; display:flex; flex-direction:column; gap:3px; }
+  .statbar .v{ color:var(--green); font-size:26px; font-weight:800; letter-spacing:-0.6px; line-height:1; }
+  .statbar .k{ color:var(--muted); font-size:12px; }
 
   /* carte (mini) */
   .mapcard{ position:relative; height:280px; border-radius:var(--rl); overflow:hidden;
@@ -236,14 +233,8 @@
 
     <!-- stats (visible après optimisation) -->
     <div class="statbar hidden" id="statbar">
-      <div class="cell">
-        <div class="ico"><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></div>
-        <div><div class="k">Durée estimée</div><div class="v" id="rTime">—</div></div>
-      </div>
-      <div class="cell">
-        <div class="ico"><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s7-6.5 7-12a7 7 0 10-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="10" r="2.5"/></svg></div>
-        <div><div class="k">Distance totale</div><div class="v" id="rDist">—</div></div>
-      </div>
+      <div class="cell"><div class="v" id="rTime">—</div><div class="k">Durée estimée</div></div>
+      <div class="cell"><div class="v" id="rDist">—</div><div class="k">Distance totale</div></div>
     </div>
 
     <!-- carte -->
