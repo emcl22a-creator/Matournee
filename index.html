@@ -445,7 +445,9 @@ function initGoogle(){
   state.mapsReady=true;
   gmap=new google.maps.Map(document.getElementById("gmap"),{
     center:{lat:47.5596,lng:7.5886}, zoom:13, disableDefaultUI:true, clickableIcons:false,
-    gestureHandling:"greedy", styles:MAP_NIGHT, backgroundColor:"#1a1a1e"
+    gestureHandling:"greedy", styles:MAP_NIGHT, backgroundColor:"#1a1a1e",
+    zoomControl:false, mapTypeControl:false, scaleControl:false, streetViewControl:false,
+    rotateControl:false, fullscreenControl:false, keyboardShortcuts:false
   });
   geocoder=new google.maps.Geocoder();
   dirService=new google.maps.DirectionsService();
@@ -512,9 +514,6 @@ function removeStop(id){ state.stops=state.stops.filter(s=>s.id!==id); state.ord
 function renderAddrList(){
   // mode SAISIE : liste éditable avec bouton supprimer
   const el=document.getElementById("stoplist"); el.innerHTML="";
-  if(!state.stops.length){
-    el.innerHTML='<div class="stop"><div class="info"><div class="addr" style="color:var(--muted);font-weight:500;">Aucune adresse pour l\'instant</div></div></div>';
-  }
   state.stops.forEach((s,i)=>{
     const isStart=i===0;
     const row=document.createElement("div"); row.className="stop";
