@@ -88,7 +88,7 @@
   .stop .num.start{ background:var(--green); border-color:var(--green); }
   .stop .num.done{ background:#2C2C2E; border-color:#2C2C2E; color:var(--muted); }
   .stop .info{ flex:1; min-width:0; }
-  .stop .addr{ color:#fff; font-size:15px; font-weight:600; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .stop .addr{ color:#fff; font-size:14px; font-weight:600; line-height:1.25; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
   .stop .eta{ color:var(--muted); font-size:13px; margin-top:2px; }
   .stop .time{ color:#fff; font-size:15px; font-weight:700; margin-right:6px; }
   .stop .chev{ color:var(--muted); font-size:16px; }
@@ -431,15 +431,29 @@ async function loadHistory(){
 }
 
 /* ================= GOOGLE MAPS ================= */
+const MAP_NIGHT = [
+  {elementType:"geometry",stylers:[{color:"#1a1a1e"}]},
+  {elementType:"labels.text.stroke",stylers:[{color:"#1a1a1e"}]},
+  {elementType:"labels.text.fill",stylers:[{color:"#6b6b70"}]},
+  {featureType:"poi",stylers:[{visibility:"off"}]},
+  {featureType:"transit",stylers:[{visibility:"off"}]},
+  {featureType:"road",elementType:"geometry",stylers:[{color:"#2a2a2e"}]},
+  {featureType:"road",elementType:"labels",stylers:[{visibility:"off"}]},
+  {featureType:"road.highway",elementType:"geometry",stylers:[{color:"#33333a"}]},
+  {featureType:"water",elementType:"geometry",stylers:[{color:"#0e0e10"}]},
+  {featureType:"landscape",elementType:"geometry",stylers:[{color:"#1a1a1e"}]},
+  {featureType:"administrative",elementType:"geometry",stylers:[{visibility:"off"}]}
+];
 function initGoogle(){
   state.mapsReady=true;
   gmap=new google.maps.Map(document.getElementById("gmap"),{
-    center:{lat:47.5596,lng:7.5886}, zoom:13, disableDefaultUI:true, clickableIcons:false, gestureHandling:"greedy"
+    center:{lat:47.5596,lng:7.5886}, zoom:13, disableDefaultUI:true, clickableIcons:false,
+    gestureHandling:"greedy", styles:MAP_NIGHT, backgroundColor:"#1a1a1e"
   });
   geocoder=new google.maps.Geocoder();
   dirService=new google.maps.DirectionsService();
-  dirRenderer=new google.maps.DirectionsRenderer({ map:gmap, suppressMarkers:false,
-    polylineOptions:{ strokeColor:"#007AFF", strokeWeight:5 }});
+  dirRenderer=new google.maps.DirectionsRenderer({ map:gmap, suppressMarkers:true,
+    polylineOptions:{ strokeColor:"#FFFFFF", strokeWeight:3, strokeOpacity:0.95 }});
   acService=new google.maps.places.AutocompleteService();
   placesService=new google.maps.places.PlacesService(gmap);
   document.getElementById("mapPlaceholder").classList.add("hidden");
@@ -521,16 +535,21 @@ function renderAddrList(){
 function fitMarkers(){
   if(!state.mapsReady) return;
   markers.forEach(m=>m.setMap(null)); markers=[];
-  const pts=state.stops.filter(s=>s.lat!=null);
+  // ordre : optimisé si dispo, sinon ordre de saisie
+  const seq = state.ordered ? state.ordered.order : state.stops.map((_,i)=>i);
   const bounds=new google.maps.LatLngBounds();
-  pts.forEach((s,i)=>{
-    const mk=new google.maps.Marker({ position:{lat:s.lat,lng:s.lng}, map:gmap,
-      label:{ text:String(i+1), color:i===0?"#fff":"#000", fontWeight:"700" },
+  let shown=0;
+  seq.forEach((idx,pos)=>{
+    const s=state.stops[idx];
+    if(!s || s.lat==null) return;
+    const isStart = pos===0;
+    const mk=new google.maps.Marker({ position:{lat:s.lat,lng:s.lng}, map:gmap, zIndex:10,
+      label:{ text:String(pos+1), color:isStart?"#fff":"#111", fontWeight:"700", fontSize:"12px" },
       icon:{ path:google.maps.SymbolPath.CIRCLE, scale:13,
-        fillColor:i===0?"#34C759":"#FFFFFF", fillOpacity:1, strokeColor:"#000", strokeWeight:1.5 }});
-    markers.push(mk); bounds.extend(mk.getPosition());
+        fillColor:isStart?"#34C759":"#FFFFFF", fillOpacity:1, strokeColor:isStart?"#34C759":"#FFFFFF", strokeWeight:0 }});
+    markers.push(mk); bounds.extend(mk.getPosition()); shown++;
   });
-  if(pts.length) gmap.fitBounds(bounds, 50);
+  if(shown) gmap.fitBounds(bounds, 50);
 }
 
 /* ================= OPTIMISATION ================= */
@@ -555,6 +574,7 @@ function runOptimize(){
     document.getElementById("rDist").textContent=(m/1000).toFixed(1).replace(".",",")+" km";
     document.getElementById("subtitle").textContent=state.stops.length+" arrêts • Optimisé pour le plus rapide";
     renderResultList();
+    fitMarkers();
     saveTour();
     showMode("result");
   });
