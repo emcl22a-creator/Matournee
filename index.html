@@ -40,7 +40,7 @@
 
   /* barre haut : menu / nom / cloche */
   .topbar{ display:flex; align-items:center; justify-content:space-between; padding:12px 20px 8px; }
-  .topbar .brand{ display:flex; align-items:center; gap:10px; }
+  .topbar .brand{ display:flex; align-items:center; gap:6px; }
   .topbar .brand img{ width:26px; height:26px; object-fit:contain; }
   .topbar .brand span{ font-size:20px; font-weight:700; color:#fff; letter-spacing:-0.3px; }
   .circle-btn{ width:40px; height:40px; border-radius:50%; background:transparent;
@@ -220,8 +220,10 @@
 
   <!-- ===== barre haut ===== -->
   <div class="topbar">
-    <button class="circle-btn" id="profileBtn"><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button>
-    <div class="brand"><img id="topLogo" alt="MaTournée"><span>MaTournée</span></div>
+    <div class="brand">
+      <button class="circle-btn" id="profileBtn" style="width:auto;height:auto;"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button>
+      <span>MaTournée</span>
+    </div>
     <button class="circle-btn" id="logoutBtn"><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 00-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 01-3.4 0"/></svg></button>
   </div>
 
@@ -708,7 +710,6 @@ document.getElementById("locBtn").onclick=centerOnMe;
 initSupabase();
 wireSwitch();
 document.getElementById("authLogo").src = LOGO_URI_WHITE;
-document.getElementById("topLogo").src = LOGO_URI_WHITE;
 checkSession();
 showMode("input");
 if(GOOGLE_MAPS_KEY){
