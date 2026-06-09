@@ -50,16 +50,16 @@
   .scroll{ flex:1; min-height:0; overflow-y:auto; -webkit-overflow-scrolling:touch; padding:8px 20px 0; }
 
   /* en-tête salutation + titre */
-  .greeting{ color:var(--muted); font-size:16px; margin:8px 0 2px; }
-  .page-title{ font-size:38px; line-height:1.05; font-weight:800; color:#fff; letter-spacing:-1px; margin:0 0 8px; }
-  .subtitle{ color:var(--muted); font-size:15px; margin:0 0 18px; }
+  .greeting{ color:var(--muted); font-size:17px; font-weight:400; margin:8px 0 2px; letter-spacing:-0.2px; }
+  .page-title{ font-size:34px; line-height:1.08; font-weight:700; color:#fff; letter-spacing:-0.4px; margin:0 0 6px; }
+  .subtitle{ color:var(--muted); font-size:15px; font-weight:400; margin:0 0 18px; letter-spacing:-0.2px; }
 
   /* carte stats (Durée / Distance) */
   .statbar{ display:flex; gap:12px; margin-bottom:14px; }
   .statbar .cell{ flex:1; background:#121214; border:1px solid rgba(255,255,255,0.07);
     border-radius:var(--rl); padding:16px 14px; text-align:center; display:flex; flex-direction:column; gap:3px; }
-  .statbar .v{ color:var(--green); font-size:26px; font-weight:800; letter-spacing:-0.6px; line-height:1; }
-  .statbar .k{ color:var(--muted); font-size:12px; }
+  .statbar .v{ color:var(--green); font-size:28px; font-weight:700; letter-spacing:-0.4px; line-height:1; }
+  .statbar .k{ color:var(--muted); font-size:13px; font-weight:400; letter-spacing:-0.1px; }
 
   /* carte (mini) */
   .mapcard{ position:relative; height:280px; border-radius:var(--rl); overflow:hidden;
@@ -85,9 +85,9 @@
   .stop .num.start{ background:var(--green); border-color:var(--green); }
   .stop .num.done{ background:#2C2C2E; border-color:#2C2C2E; color:var(--muted); }
   .stop .info{ flex:1; min-width:0; }
-  .stop .addr{ color:#fff; font-size:14px; font-weight:600; line-height:1.25; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
-  .stop .eta{ color:var(--muted); font-size:13px; margin-top:2px; }
-  .stop .time{ color:#fff; font-size:15px; font-weight:700; margin-right:6px; }
+  .stop .addr{ color:#fff; font-size:16px; font-weight:400; line-height:1.3; letter-spacing:-0.2px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .stop .eta{ color:var(--muted); font-size:13px; font-weight:400; margin-top:2px; letter-spacing:-0.1px; }
+  .stop .time{ color:#fff; font-size:16px; font-weight:600; margin-right:6px; letter-spacing:-0.2px; }
   .stop .chev{ color:var(--muted); font-size:16px; }
 
   /* barre de saisie (vue input) */
@@ -102,7 +102,7 @@
 
   /* barre du bas fixe : bouton démarrer + ··· */
   .bottombar{ display:flex; gap:10px; padding:12px 20px calc(14px + env(safe-area-inset-bottom)); }
-  .btn{ border:none; border-radius:16px; font-size:17px; font-weight:700; padding:17px; flex:1;
+  .btn{ border:none; border-radius:16px; font-size:17px; font-weight:600; padding:16px; flex:1; letter-spacing:-0.2px;
     color:#000; background:#fff; display:flex; align-items:center; justify-content:center; gap:9px;
     transition:transform .12s ease, opacity .12s ease; }
   .btn:active{ transform:scale(0.97); }
@@ -218,10 +218,9 @@
   <!-- ===== barre haut ===== -->
   <div class="topbar">
     <div class="brand">
-      <button class="circle-btn" id="profileBtn" style="width:auto;height:auto;"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button>
-      <span>MaTournée</span>
+      <img id="topLogo" alt="MaTournée" style="height:30px;width:auto;object-fit:contain;">
     </div>
-    <button class="circle-btn" id="logoutBtn"><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 00-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 01-3.4 0"/></svg></button>
+    <button class="circle-btn" id="logoutBtn" aria-label="Se déconnecter"><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4h3a2 2 0 012 2v12a2 2 0 01-2 2h-3"/><path d="M10 8l-4 4 4 4"/><path d="M6 12h10"/></svg></button>
   </div>
 
   <!-- ===== zone scrollable ===== -->
@@ -252,7 +251,6 @@
 
     <!-- VUE SAISIE : champ d'ajout -->
     <div id="viewInput">
-      <div class="hint">Ajoutez vos adresses, on calcule l'ordre le plus rapide.</div>
       <div class="input-bar">
         <input id="addrInput" type="text" placeholder="Saisir une adresse…" autocomplete="off">
         <button class="btn blue" id="addBtn" style="flex:none; width:56px; padding:14px;"><svg viewBox="0 0 24 24" width="1.1em" height="1.1em" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg></button>
@@ -706,7 +704,7 @@ function toast(msg){
 document.getElementById("authBtn").onclick=doAuth;
 document.getElementById("authPass").addEventListener("keydown",e=>{ if(e.key==="Enter") doAuth(); });
 document.getElementById("logoutBtn").onclick=logout;
-document.getElementById("profileBtn").onclick=()=>{ showMode("hist"); loadHistory(); };
+document.getElementById("topLogo").onclick=()=>{ showMode("hist"); loadHistory(); };
 document.getElementById("addBtn").onclick=addStopManual;
 document.getElementById("addrInput").addEventListener("input",e=>onAddrInput(e.target.value));
 document.getElementById("addrInput").addEventListener("keydown",e=>{ if(e.key==="Enter"){ hideSug(); addStopManual(); }});
@@ -721,6 +719,7 @@ document.getElementById("locBtn").onclick=centerOnMe;
 initSupabase();
 wireSwitch();
 document.getElementById("authLogo").src = LOGO_URI_WHITE;
+document.getElementById("topLogo").src = LOGO_URI_WHITE;
 checkSession();
 showMode("input");
 if(GOOGLE_MAPS_KEY){
