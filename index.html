@@ -231,9 +231,9 @@
     <div class="subtitle" id="subtitle">Ajoutez vos adresses pour commencer</div>
 
     <!-- stats (visible après optimisation) -->
-    <div class="statbar hidden" id="statbar">
-      <div class="cell"><div class="v" id="rTime">—</div><div class="k">Durée estimée</div></div>
-      <div class="cell"><div class="v" id="rDist">—</div><div class="k">Distance totale</div></div>
+    <div class="statbar" id="statbar">
+      <div class="cell"><div class="v" id="rTime">0 min</div><div class="k">Durée estimée</div></div>
+      <div class="cell"><div class="v" id="rDist">0 km</div><div class="k">Distance totale</div></div>
     </div>
 
     <!-- carte -->
@@ -665,8 +665,8 @@ function showMode(m){
   // m = 'input' | 'result' | 'nav' | 'hist'
   const scroll=document.getElementById("scroll");
   scroll.classList.remove("view-enter"); void scroll.offsetWidth; scroll.classList.add("view-enter");
-  // stats visibles seulement en result/nav
-  document.getElementById("statbar").classList.toggle("hidden", !(m==="result"||m==="nav"));
+  // stats visibles partout sauf en historique
+  document.getElementById("statbar").classList.toggle("hidden", m==="hist");
   // bloc saisie (champ d'ajout) visible seulement en input
   document.getElementById("viewInput").classList.toggle("hidden", m!=="input");
   // historique
@@ -676,8 +676,12 @@ function showMode(m){
   document.getElementById("bottomInput").classList.toggle("hidden", m!=="input");
   document.getElementById("bottomResult").classList.toggle("hidden", m!=="result");
   document.getElementById("bottomNav").classList.toggle("hidden", m!=="nav");
-  // titre/sous-titre
+  // en mode saisie : stats à 0 tant que pas optimisé
   if(m==="input"){
+    if(!state.ordered){
+      document.getElementById("rTime").textContent = "0 min";
+      document.getElementById("rDist").textContent = "0 km";
+    }
     document.getElementById("subtitle").textContent = state.stops.length? (state.stops.length+" adresses ajoutées") : "Ajoutez vos adresses pour commencer";
     renderAddrList();
   }
