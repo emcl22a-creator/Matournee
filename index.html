@@ -50,7 +50,7 @@
   .scroll{ flex:1; min-height:0; overflow-y:auto; -webkit-overflow-scrolling:touch; padding:8px 20px 0; }
 
   /* en-tête salutation + titre */
-  .greeting{ color:var(--muted); font-size:17px; font-weight:400; margin:8px 0 2px; letter-spacing:-0.2px; }
+  .greeting{ color:var(--muted); font-size:15px; font-weight:400; margin:8px 0 2px; letter-spacing:-0.2px; }
   .page-title{ font-size:34px; line-height:1.08; font-weight:700; color:#fff; letter-spacing:-0.4px; margin:0 0 6px; }
   .subtitle{ color:var(--muted); font-size:15px; font-weight:400; margin:0 0 18px; letter-spacing:-0.2px; }
 
@@ -73,10 +73,6 @@
   .loc-btn{ position:absolute; left:14px; top:14px; width:42px; height:42px; border-radius:50%;
     background:rgba(20,20,22,0.85); backdrop-filter:blur(8px); border:1px solid rgba(255,255,255,0.12);
     color:#fff; font-size:18px; z-index:3; }
-  .map-badge{ position:absolute; right:14px; top:14px; background:rgba(20,20,22,0.85); backdrop-filter:blur(8px);
-    border-radius:10px; padding:6px 10px; font-size:12px; font-weight:600; color:#fff; display:flex;
-    align-items:center; gap:6px; z-index:3; }
-  .map-badge .dot{ width:7px; height:7px; border-radius:50%; background:var(--green); }
 
   /* liste d'arrêts façon maquette */
   .stoplist{ background:#121214; border:1px solid rgba(255,255,255,0.07); border-radius:var(--rl);
@@ -95,10 +91,14 @@
 
   /* barre de saisie (vue input) */
   .hint{ color:var(--muted); font-size:15px; line-height:1.35; margin-bottom:4px; }
-  .input-bar{ display:flex; gap:8px; position:relative; margin-bottom:12px; }
+  .input-bar{ display:flex; position:relative; margin-bottom:12px; }
   .input-bar input{ flex:1; background:#1C1C1E; border:1px solid rgba(255,255,255,0.1); outline:none;
-    color:#fff; font-size:16px; padding:14px; border-radius:var(--rm); }
+    color:#fff; font-size:16px; padding:15px 58px 15px 20px; border-radius:100px; }
   .input-bar input::placeholder{ color:var(--muted); }
+  .add-inline{ position:absolute; right:6px; top:50%; transform:translateY(-50%); width:40px; height:40px;
+    border-radius:50%; border:none; background:var(--green); color:#04130a; display:flex; align-items:center;
+    justify-content:center; transition:transform .12s ease; }
+  .add-inline:active{ transform:translateY(-50%) scale(0.92); }
   .suggestions{ position:absolute; top:56px; left:0; right:0; background:#1C1C1E; border:1px solid rgba(255,255,255,0.1);
     border-radius:var(--rm); overflow:hidden; max-height:200px; overflow-y:auto; display:none; z-index:10; }
   .suggestions div{ padding:12px 14px; font-size:14px; color:#fff; border-bottom:1px solid rgba(255,255,255,0.06); }
@@ -250,7 +250,6 @@
       <div id="mapPlaceholder"><div style="font-size:26px;"><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s7-6.5 7-12a7 7 0 10-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="10" r="2.5"/></svg></div><div>La carte s'affiche ici</div></div>
       <div id="gmap" class="hidden"></div>
       <button class="loc-btn hidden" id="locBtn"><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l8 18-8-4-8 4z"/></svg></button>
-      <div class="map-badge"><span class="dot"></span><span id="mapLabel">Carte</span></div>
       <div class="nav-top hidden" id="navTop">
         <div class="turn"><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg></div>
         <div style="flex:1;"><div class="big" id="navInstr">Prochain arrêt</div><div class="small" id="navDetail">—</div></div>
@@ -262,7 +261,7 @@
     <div id="viewInput">
       <div class="input-bar">
         <input id="addrInput" type="text" placeholder="Saisir une adresse…" autocomplete="off">
-        <button class="btn blue" id="addBtn" style="flex:none; width:56px; padding:14px;"><svg viewBox="0 0 24 24" width="1.1em" height="1.1em" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg></button>
+        <button class="add-inline" id="addBtn" aria-label="Ajouter l'adresse"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg></button>
         <div class="suggestions" id="suggestions"></div>
       </div>
     </div>
@@ -457,7 +456,6 @@ function initGoogle(){
   document.getElementById("mapPlaceholder").classList.add("hidden");
   document.getElementById("gmap").classList.remove("hidden");
   document.getElementById("locBtn").classList.remove("hidden");
-  document.getElementById("mapLabel").textContent="Google Maps";
 }
 window.initGoogle=initGoogle;
 
