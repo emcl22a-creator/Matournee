@@ -185,26 +185,26 @@
 
   <!-- ===== barre haut ===== -->
   <div class="topbar">
-    <button class="circle-btn" id="profileBtn">􀉭</button>
+    <button class="circle-btn" id="profileBtn"><svg viewBox="0 0 24 24" width="1em" height="1em" style="vertical-align:-0.125em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></button>
     <div class="segment">
-      <button id="tabPlan" class="active">􀋒 Tournée</button>
-      <button id="tabHist">􀐫 Historique</button>
+      <button id="tabPlan" class="active"><svg viewBox="0 0 24 24" width="1em" height="1em" style="vertical-align:-0.125em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 20l-6 2V6l6-2m0 16l6-2m-6 2V4m6 14l6 2V6l-6-2m0 14V4"/></svg> Tournée</button>
+      <button id="tabHist"><svg viewBox="0 0 24 24" width="1em" height="1em" style="vertical-align:-0.125em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4L19 9l-4-4L4 16v4zM14 6l4 4"/></svg> Historique</button>
     </div>
-    <button class="circle-btn" id="logoutBtn">􀍃</button>
+    <button class="circle-btn" id="logoutBtn"><svg viewBox="0 0 24 24" width="1em" height="1em" style="vertical-align:-0.125em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 4h3a2 2 0 012 2v12a2 2 0 01-2 2h-3M10 17l5-5-5-5M15 12H3"/></svg></button>
   </div>
 
   <!-- ===== carte ===== -->
   <div class="sheet">
     <div id="mapZone">
       <div id="mapPlaceholder">
-        <div style="font-size:30px;">􀙨</div>
+        <div style="font-size:30px;"><svg viewBox="0 0 24 24" width="1em" height="1em" style="vertical-align:-0.125em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V9a3 3 0 013-3h5m0 0l-3-3m3 3l-3 3"/></svg></div>
         <div>La carte Google s'affiche ici<br>dès que la clé API est ajoutée.</div>
       </div>
       <div id="gmap" class="hidden"></div>
       <div class="map-badge"><span class="dot"></span><span id="mapLabel">Carte</span></div>
-      <button class="loc-btn hidden" id="locBtn">􀋑</button>
+      <button class="loc-btn hidden" id="locBtn"><svg viewBox="0 0 24 24" width="1em" height="1em" style="vertical-align:-0.125em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><circle cx="12" cy="12" r="8"/><path d="M12 2v3m0 14v3m10-10h-3M5 12H2"/></svg></button>
       <div class="nav-top hidden" id="navTop">
-        <div class="turn">􀄵</div>
+        <div class="turn"><svg viewBox="0 0 24 24" width="1em" height="1em" style="vertical-align:-0.125em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg></div>
         <div style="flex:1;">
           <div class="big" id="navInstr">Prochain arrêt</div>
           <div class="small" id="navDetail">—</div>
@@ -225,9 +225,9 @@
       <div class="input-bar">
         <div class="suggestions" id="suggestions"></div>
         <input id="addrInput" type="text" placeholder="Saisir une adresse…" autocomplete="off">
-        <button class="btn icon" id="addBtn">􀅼</button>
+        <button class="btn icon" id="addBtn"><svg viewBox="0 0 24 24" width="1em" height="1em" style="vertical-align:-0.125em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg></button>
       </div>
-      <button class="btn" id="optBtn" disabled>􀋒 Optimiser la tournée</button>
+      <button class="btn" id="optBtn" disabled><svg viewBox="0 0 24 24" width="1em" height="1em" style="vertical-align:-0.125em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 20l-6 2V6l6-2m0 16l6-2m-6 2V4m6 14l6 2V6l-6-2m0 14V4"/></svg> Optimiser la tournée</button>
     </div>
 
     <!-- RÉSULTAT -->
@@ -239,8 +239,8 @@
       </div>
       <div class="addr-list" id="resultList"></div>
       <div class="btn-row">
-        <button class="btn green" id="navBtn">􀋒 Démarrer la navigation</button>
-        <button class="btn secondary icon" id="editBtn">􀈊</button>
+        <button class="btn green" id="navBtn"><svg viewBox="0 0 24 24" width="1em" height="1em" style="vertical-align:-0.125em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 20l-6 2V6l6-2m0 16l6-2m-6 2V4m6 14l6 2V6l-6-2m0 14V4"/></svg> Démarrer la navigation</button>
+        <button class="btn secondary icon" id="editBtn"><svg viewBox="0 0 24 24" width="1em" height="1em" style="vertical-align:-0.125em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M15 9l-6 6M9 9l6 6"/></svg></button>
       </div>
     </div>
 
@@ -252,8 +252,8 @@
       </div>
       <div class="addr-list" id="navList"></div>
       <div class="btn-row">
-        <button class="btn green" id="doneBtn">􀆅 Arrêt livré</button>
-        <button class="btn secondary" id="stopNavBtn">􀛷 Arrêter</button>
+        <button class="btn green" id="doneBtn"><svg viewBox="0 0 24 24" width="1em" height="1em" style="vertical-align:-0.125em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 20l-5.5 2.5V6L9 3.5m0 16.5l6-3m-6 3V3.5m6 13.5l5.5 2.5V4l-5.5-2.5m0 15V1.5"/></svg> Arrêt livré</button>
+        <button class="btn secondary" id="stopNavBtn"><svg viewBox="0 0 24 24" width="1em" height="1em" style="vertical-align:-0.125em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="7" y="7" width="10" height="10" rx="2"/></svg> Arrêter</button>
       </div>
     </div>
 
@@ -267,6 +267,24 @@
 
 <script>
 /* ================= ÉTAT ================= */
+const ICON_PATHS = {
+  route:'<path d="M9 20l-5.5 2.5V6L9 3.5m0 16.5l6-3m-6 3V3.5m6 13.5l5.5 2.5V4l-5.5-2.5m0 15V1.5"/>',
+  user:'<circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.5-6 8-6s8 2 8 6"/>',
+  logout:'<path d="M15 4h3a2 2 0 012 2v12a2 2 0 01-2 2h-3M10 17l5-5-5-5M15 12H3"/>',
+  clock:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
+  plus:'<path d="M12 5v14M5 12h14"/>',
+  flag:'<path d="M5 21V4m0 0l9 2-2 5 6 1.5-3 1.5M5 4l9 2"/>',
+  xcircle:'<circle cx="12" cy="12" r="9"/><path d="M15 9l-6 6M9 9l6 6"/>',
+  pencil:'<path d="M4 20h4L19 9l-4-4L4 16v4zM14 6l4 4"/>',
+  check:'<path d="M5 13l4 4L19 7"/>',
+  stop:'<rect x="7" y="7" width="10" height="10" rx="2"/>',
+  locate:'<circle cx="12" cy="12" r="3"/><circle cx="12" cy="12" r="8"/><path d="M12 2v3m0 14v3m10-10h-3M5 12H2"/>',
+  map:'<path d="M9 20l-6 2V6l6-2m0 16l6-2m-6 2V4m6 14l6 2V6l-6-2m0 14V4"/>',
+  turn:'<path d="M9 18V9a3 3 0 013-3h5m0 0l-3-3m3 3l-3 3"/>'
+};
+function ic(name){
+  return '<svg viewBox="0 0 24 24" width="1em" height="1em" style="vertical-align:-0.125em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">'+(ICON_PATHS[name]||'')+'</svg>';
+}
 const state = { stops:[], ordered:null, counter:0, navIndex:0, mapsReady:false, user:null };
 let sb=null, gmap=null, dirService=null, dirRenderer=null, geocoder=null, autocomplete=null;
 let placesService=null, acService=null, meMarker=null, watchId=null, markers=[];
@@ -439,9 +457,9 @@ function renderAddrList(){
   state.stops.forEach((s,i)=>{
     const isStart=i===0;
     const row=document.createElement("div"); row.className="addr-row";
-    row.innerHTML=`<span class="pin ${isStart?'start':''}">${isStart?'􀋊':i}</span>
+    row.innerHTML=`<span class="pin ${isStart?'start':''}">${isStart?ic('flag'):i}</span>
       <span class="txt">${isStart?'Départ — ':''}${escapeHtml(s.name)}</span>
-      <button class="del" data-id="${s.id}">􀁠</button>`;
+      <button class="del" data-id="${s.id}"><svg viewBox="0 0 24 24" width="1em" height="1em" style="vertical-align:-0.125em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.5-6 8-6s8 2 8 6"/></svg></button>`;
     el.appendChild(row);
   });
   el.querySelectorAll(".del").forEach(b=> b.onclick=()=>removeStop(b.dataset.id));
@@ -495,7 +513,7 @@ function renderResultList(){
   state.ordered.order.forEach((idx,i)=>{
     const s=state.stops[idx];
     const row=document.createElement("div"); row.className="addr-row";
-    row.innerHTML=`<span class="pin ${i===0?'start':''}">${i===0?'􀋊':i}</span>
+    row.innerHTML=`<span class="pin ${i===0?'start':''}">${i===0?ic('flag'):i}</span>
       <span class="txt">${escapeHtml(s.name)}</span>`;
     el.appendChild(row);
   });
@@ -518,7 +536,7 @@ function renderNavList(){
     const done=i<state.navIndex, current=i===state.navIndex;
     const row=document.createElement("div"); row.className="addr-row";
     row.style.opacity = done?0.5:1;
-    row.innerHTML=`<span class="pin ${done?'done':(current?'start':'')}">${done?'􀆅':i+1}</span>
+    row.innerHTML=`<span class="pin ${done?'done':(current?'start':'')}">${done?ic('check'):i+1}</span>
       <span class="txt">${escapeHtml(s.name)}</span>${current?'<span class="sub">en cours</span>':''}`;
     el.appendChild(row);
   });
@@ -527,7 +545,7 @@ function renderNavList(){
 }
 function updateNavTarget(){
   if(state.navIndex>=state.ordered.order.length){
-    document.getElementById("navInstr").textContent="Tournée terminée 􀆅";
+    document.getElementById("navInstr").textContent="Tournée terminée "+ic('check');
     document.getElementById("navDetail").textContent="Tous les arrêts sont livrés";
     document.getElementById("navDist").textContent="";
     return;
