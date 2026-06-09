@@ -51,7 +51,7 @@
 
   /* en-tête salutation + titre */
   .greeting{ color:var(--muted); font-size:15px; font-weight:400; margin:8px 0 2px; letter-spacing:-0.2px; }
-  .page-title{ font-size:34px; line-height:1.08; font-weight:700; color:#fff; letter-spacing:-0.4px; margin:0 0 6px; }
+  .page-title{ font-size:27px; line-height:1.1; font-weight:700; color:#fff; letter-spacing:-0.6px; margin:0 0 6px; white-space:nowrap; }
   .subtitle{ color:var(--muted); font-size:15px; font-weight:400; margin:0 0 18px; letter-spacing:-0.2px; }
 
   /* carte stats (Durée / Distance) */
@@ -230,7 +230,7 @@
   <div class="scroll" id="scroll">
 
     <div class="greeting" id="greeting">Bonjour 👋</div>
-    <h1 class="page-title">Votre tournée<br>du jour</h1>
+    <h1 class="page-title">Votre tournée du jour</h1>
     <div class="subtitle" id="subtitle">Ajoutez vos adresses pour commencer</div>
 
     <!-- stats (visible après optimisation) -->
@@ -279,7 +279,7 @@
 
   <!-- ===== barre du bas ===== -->
   <div class="bottombar" id="bottomInput">
-    <button class="btn" id="optBtn" disabled><svg viewBox="0 0 24 24" width="1.2em" height="1.2em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="19" r="2.2"/><circle cx="18" cy="5" r="2.2"/><path d="M6 16.8V12a3 3 0 013-3h6a3 3 0 003-3"/></svg> Optimiser la tournée</button>
+    <button class="btn" id="optBtn"><svg viewBox="0 0 24 24" width="1.2em" height="1.2em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="19" r="2.2"/><circle cx="18" cy="5" r="2.2"/><path d="M6 16.8V12a3 3 0 013-3h6a3 3 0 003-3"/></svg> Optimiser la tournée</button>
   </div>
 
   <div class="bottombar hidden" id="bottomResult">
@@ -514,6 +514,7 @@ function removeStop(id){ state.stops=state.stops.filter(s=>s.id!==id); state.ord
 function renderAddrList(){
   // mode SAISIE : liste éditable avec bouton supprimer
   const el=document.getElementById("stoplist"); el.innerHTML="";
+  el.style.display = state.stops.length ? "block" : "none";
   state.stops.forEach((s,i)=>{
     const isStart=i===0;
     const row=document.createElement("div"); row.className="stop";
@@ -523,7 +524,6 @@ function renderAddrList(){
     el.appendChild(row);
   });
   el.querySelectorAll(".del").forEach(b=> b.onclick=(e)=>{ e.stopPropagation(); removeStop(b.dataset.id); });
-  document.getElementById("optBtn").disabled = state.stops.length<2;
   staggerRows(el);
 }
 
@@ -586,7 +586,7 @@ function computeETAs(){
 }
 
 function renderResultList(){
-  const el=document.getElementById("stoplist"); el.innerHTML="";
+  const el=document.getElementById("stoplist"); el.innerHTML=""; el.style.display="block";
   const etas=computeETAs();
   state.ordered.order.forEach((idx,i)=>{
     const s=state.stops[idx];
@@ -714,7 +714,6 @@ function toast(msg){
 document.getElementById("authBtn").onclick=doAuth;
 document.getElementById("authPass").addEventListener("keydown",e=>{ if(e.key==="Enter") doAuth(); });
 document.getElementById("logoutBtn").onclick=logout;
-document.getElementById("topLogo").onclick=()=>{ showMode("hist"); loadHistory(); };
 document.getElementById("addBtn").onclick=addStopManual;
 document.getElementById("addrInput").addEventListener("input",e=>onAddrInput(e.target.value));
 document.getElementById("addrInput").addEventListener("keydown",e=>{ if(e.key==="Enter"){ hideSug(); addStopManual(); }});
