@@ -122,6 +122,46 @@
   .logo-box img{ width:100%; height:100%; object-fit:contain; }
 
   .hidden{ display:none !important; }
+
+  /* ===== ANIMATIONS D'ENTRÉE (style iOS) ===== */
+  @keyframes fadeUp{ from{ opacity:0; transform:translateY(14px); } to{ opacity:1; transform:translateY(0); } }
+  @keyframes fadeIn{ from{ opacity:0; } to{ opacity:1; } }
+  @keyframes scaleIn{ from{ opacity:0; transform:scale(0.94); } to{ opacity:1; transform:scale(1); } }
+  @keyframes slideInRight{ from{ opacity:0; transform:translateX(22px); } to{ opacity:1; transform:translateX(0); } }
+  @keyframes drawerUp{ from{ opacity:0; transform:translateY(34px); } to{ opacity:1; transform:translateY(0); } }
+  @keyframes popLogo{ 0%{ opacity:0; transform:scale(0.7); } 60%{ transform:scale(1.06); } 100%{ opacity:1; transform:scale(1); } }
+
+  /* éléments animés au chargement */
+  .topbar{ animation:fadeIn .5s ease both; }
+  .sheet{ animation:scaleIn .55s cubic-bezier(.22,1,.36,1) both; }
+  .drawer{ animation:drawerUp .55s cubic-bezier(.22,1,.36,1) .08s both; }
+
+  /* carte d'auth */
+  .auth-card{ animation:scaleIn .5s cubic-bezier(.22,1,.36,1) both; }
+  .logo-box img{ animation:popLogo .6s cubic-bezier(.22,1,.36,1) both; }
+  .auth-card h1{ animation:fadeUp .5s ease .08s both; }
+  .auth-card p{ animation:fadeUp .5s ease .14s both; }
+  .auth-card input{ animation:fadeUp .5s ease both; }
+  .auth-card input:nth-of-type(1){ animation-delay:.18s; }
+  .auth-card input:nth-of-type(2){ animation-delay:.24s; }
+  .auth-card .btn{ animation:fadeUp .5s ease .30s both; }
+  .auth-switch{ animation:fadeUp .5s ease .36s both; }
+
+  /* changement de vue dans le tiroir : la vue qui devient visible s'anime */
+  .view-enter{ animation:slideInRight .42s cubic-bezier(.22,1,.36,1) both; }
+
+  /* lignes de liste en cascade (classe ajoutée par JS) */
+  .row-stagger{ animation:fadeUp .42s cubic-bezier(.22,1,.36,1) both; }
+
+  /* bandeau navigation */
+  .nav-top{ animation:fadeUp .4s cubic-bezier(.22,1,.36,1) both; }
+
+  @media (prefers-reduced-motion: reduce){
+    .topbar,.sheet,.drawer,.auth-card,.logo-box img,.auth-card h1,.auth-card p,
+    .auth-card input,.auth-card .btn,.auth-switch,.view-enter,.row-stagger,.nav-top{
+      animation:none !important;
+    }
+  }
 </style>
 </head>
 <body>
@@ -322,6 +362,7 @@ async function loadHistory(){
     row.onclick=()=>{ state.stops=t.stops||[]; state.ordered=t.ordered||null; setTab("plan"); renderAddrList(); };
     el.appendChild(row);
   });
+  staggerRows(el);
 }
 
 /* ================= GOOGLE MAPS ================= */
@@ -405,6 +446,7 @@ function renderAddrList(){
   });
   el.querySelectorAll(".del").forEach(b=> b.onclick=()=>removeStop(b.dataset.id));
   document.getElementById("optBtn").disabled = state.stops.length<2;
+  staggerRows(el);
 }
 
 function fitMarkers(){
@@ -542,8 +584,27 @@ function centerOnMe(){
 
 /* ================= VUES ================= */
 function switchView(v){
-  ["Input","Result","Nav","Hist"].forEach(name=>
-    document.getElementById("view"+name).classList.toggle("hidden", v!==name.toLowerCase()));
+  ["Input","Result","Nav","Hist"].forEach(name=>{
+    const el=document.getElementById("view"+name);
+    const show = v===name.toLowerCase();
+    el.classList.toggle("hidden", !show);
+    if(show){
+      el.classList.remove("view-enter");
+      void el.offsetWidth;            // relance l'animation
+      el.classList.add("view-enter");
+      staggerRows(el);
+    }
+  });
+}
+/* fait apparaître les lignes d'une liste en cascade */
+function staggerRows(container){
+  const rows = container.querySelectorAll(".addr-row");
+  rows.forEach((r,i)=>{
+    r.classList.remove("row-stagger");
+    void r.offsetWidth;
+    r.style.animationDelay = (i*0.05)+"s";
+    r.classList.add("row-stagger");
+  });
 }
 function setTab(t){
   document.getElementById("tabPlan").classList.toggle("active",t==="plan");
