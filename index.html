@@ -55,7 +55,8 @@
   .subtitle{ color:var(--muted); font-size:15px; font-weight:400; margin:0 0 18px; letter-spacing:-0.2px; }
 
   /* carte stats (Durée / Distance) */
-  .statbar{ display:flex; gap:12px; background:#121214; border:1px solid rgba(255,255,255,0.07);
+  .statbar{ display:flex; gap:12px; background:rgba(255,255,255,0.06); backdrop-filter:blur(20px) saturate(160%);
+    -webkit-backdrop-filter:blur(20px) saturate(160%); border:1px solid rgba(255,255,255,0.12);
     border-radius:var(--rl); padding:16px; margin-bottom:14px; }
   .statbar .cell{ display:flex; align-items:center; gap:12px; flex:1; }
   .statbar .cell + .cell{ border-left:1px solid rgba(255,255,255,0.08); padding-left:14px; }
@@ -71,7 +72,8 @@
   #mapPlaceholder{ position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
     flex-direction:column; gap:8px; color:var(--muted); text-align:center; padding:24px; }
   .loc-btn{ position:absolute; left:14px; top:14px; width:42px; height:42px; border-radius:50%;
-    background:rgba(20,20,22,0.85); backdrop-filter:blur(8px); border:1px solid rgba(255,255,255,0.12);
+    background:rgba(255,255,255,0.1); backdrop-filter:blur(16px) saturate(160%);
+    -webkit-backdrop-filter:blur(16px) saturate(160%); border:1px solid rgba(255,255,255,0.18);
     color:#fff; font-size:18px; z-index:3; }
 
   /* liste d'arrêts façon maquette */
@@ -92,7 +94,8 @@
   /* barre de saisie (vue input) */
   .hint{ color:var(--muted); font-size:15px; line-height:1.35; margin-bottom:4px; }
   .input-bar{ display:flex; position:relative; margin-bottom:12px; }
-  .input-bar input{ flex:1; background:#1C1C1E; border:1px solid rgba(255,255,255,0.1); outline:none;
+  .input-bar input{ flex:1; background:rgba(255,255,255,0.06); backdrop-filter:blur(20px) saturate(160%);
+    -webkit-backdrop-filter:blur(20px) saturate(160%); border:1px solid rgba(255,255,255,0.12); outline:none;
     color:#fff; font-size:16px; padding:15px 58px 15px 20px; border-radius:100px; }
   .input-bar input::placeholder{ color:var(--muted); }
   .add-inline{ position:absolute; right:6px; top:50%; transform:translateY(-50%); width:40px; height:40px;
@@ -150,6 +153,13 @@
     box-shadow:0 6px 16px rgba(0,0,0,0.55); }
   .logo-box img{ width:72%; height:72%; object-fit:contain; }
 
+  /* ===== fond étoilé animé ===== */
+  .starfield{ position:fixed; inset:0; z-index:0; pointer-events:none; overflow:hidden; }
+  .starfield .star{ position:absolute; width:2px; height:2px; border-radius:50%; background:#fff;
+    opacity:0.5; animation:twinkle 3s ease-in-out infinite; }
+  @keyframes twinkle{ 0%,100%{ opacity:0.15; transform:scale(0.8); } 50%{ opacity:0.9; transform:scale(1.2); } }
+  #app{ position:relative; z-index:1; }
+
   .hidden{ display:none !important; }
 
   /* ===== ANIMATIONS D'ENTRÉE (style iOS) ===== */
@@ -194,6 +204,7 @@
 </style>
 </head>
 <body>
+<div class="starfield" id="starfield" aria-hidden="true"></div>
 <div id="app">
 
   <!-- ===== AUTH (obligatoire) ===== -->
@@ -725,6 +736,21 @@ document.getElementById("stopNavBtn").onclick=stopNav;
 document.getElementById("locBtn").onclick=centerOnMe;
 
 /* ================= DÉMARRAGE ================= */
+function genererEtoiles(){
+  const sf=document.getElementById("starfield");
+  if(!sf) return;
+  const N=50; // 30 de moins que Frizz
+  let html="";
+  for(let i=0;i<N;i++){
+    const x=Math.random()*100, y=Math.random()*100;
+    const delay=(Math.random()*3 - 1.5).toFixed(2); // certaines visibles direct
+    const dur=(2+Math.random()*2.5).toFixed(2);
+    const sz=(Math.random()*1.5+1).toFixed(1);
+    html+=`<span class="star" style="left:${x}%;top:${y}%;width:${sz}px;height:${sz}px;animation-delay:${delay}s;animation-duration:${dur}s;"></span>`;
+  }
+  sf.innerHTML=html;
+}
+genererEtoiles();
 initSupabase();
 wireSwitch();
 document.getElementById("authLogo").src = LOGO_URI_WHITE;
