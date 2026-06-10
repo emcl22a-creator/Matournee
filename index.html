@@ -212,6 +212,15 @@
     display:flex; align-items:center; justify-content:center; gap:8px; }
   .import-btn:active{ background:rgba(255,255,255,0.04); }
 
+  /* actions de ligne (réorganiser) */
+  .row-actions{ display:flex; align-items:center; gap:2px; flex:none; }
+  .row-actions .ra{ width:30px; height:30px; border:none; background:none; color:var(--muted);
+    display:flex; align-items:center; justify-content:center; font-size:16px; border-radius:8px; }
+  .row-actions .ra:active{ background:rgba(255,255,255,0.08); }
+  .row-actions .ra[disabled]{ opacity:0.25; }
+  .row-actions .ra.lock.on{ color:var(--green); }
+  .row-actions .ra.del{ color:#FF6961; }
+
   .hidden{ display:none !important; }
 
   /* ===== ANIMATIONS D'ENTRÉE (style iOS) ===== */
@@ -392,7 +401,11 @@ const ICON_PATHS = {
   // carte : épingle de localisation (pour placeholder)
   pin:'<path d="M12 22s7-6.5 7-12a7 7 0 10-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="10" r="2.5"/>',
   // navigation : flèche de direction (boussole/nav)
-  nav:'<path d="M12 3l8 18-8-4-8 4z"/>'
+  nav:'<path d="M12 3l8 18-8-4-8 4z"/>',
+  chevup:'<path d="M6 15l6-6 6 6"/>',
+  chevdown:'<path d="M6 9l6 6 6-6"/>',
+  lock:'<rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 018 0v3"/>',
+  unlock:'<rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 017.9-1"/>'
 };
 function ic(name){
   return '<svg viewBox="0 0 24 24" width="1em" height="1em" style="vertical-align:-0.125em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">'+(ICON_PATHS[name]||'')+'</svg>';
@@ -655,19 +668,39 @@ function addStopManual(){
 function removeStop(id){ state.stops=state.stops.filter(s=>s.id!==id); state.ordered=null; showMode("input"); fitMarkers(); }
 
 function renderAddrList(){
-  // mode SAISIE : liste éditable avec bouton supprimer
+  // mode SAISIE : liste éditable avec réorganisation
   const el=document.getElementById("stoplist"); el.innerHTML="";
   el.style.display = state.stops.length ? "block" : "none";
   state.stops.forEach((s,i)=>{
     const isStart=i===0;
+    const locked=s.locked;
     const row=document.createElement("div"); row.className="stop";
     row.innerHTML=`<span class="num ${isStart?'start':''}">${isStart?ic('flag'):i}</span>
-      <div class="info"><div class="addr">${escapeHtml(s.name)}</div><div class="eta">${isStart?'Départ':'Arrêt '+i}</div></div>
-      <button class="del" data-id="${s.id}" style="background:none;border:none;color:var(--muted);font-size:18px;">${ic('trash')}</button>`;
+      <div class="info"><div class="addr"><span class="addr-txt">${escapeHtml(s.name)}</span>${locked?' <span class="badge blater">🔒</span>':''}</div><div class="eta">${isStart?'Départ':'Arrêt '+i}</div></div>
+      <div class="row-actions">
+        <button class="ra up" data-i="${i}" aria-label="Monter" ${i===0?'disabled':''}>${ic('chevup')}</button>
+        <button class="ra down" data-i="${i}" aria-label="Descendre" ${i===state.stops.length-1?'disabled':''}>${ic('chevdown')}</button>
+        <button class="ra lock ${locked?'on':''}" data-id="${s.id}" aria-label="Verrouiller">${ic(locked?'lock':'unlock')}</button>
+        <button class="ra del" data-id="${s.id}" aria-label="Supprimer">${ic('trash')}</button>
+      </div>`;
     el.appendChild(row);
   });
-  el.querySelectorAll(".del").forEach(b=> b.onclick=(e)=>{ e.stopPropagation(); removeStop(b.dataset.id); });
+  el.querySelectorAll(".ra.del").forEach(b=> b.onclick=(e)=>{ e.stopPropagation(); removeStop(b.dataset.id); });
+  el.querySelectorAll(".ra.up").forEach(b=> b.onclick=(e)=>{ e.stopPropagation(); moveStop(+b.dataset.i,-1); });
+  el.querySelectorAll(".ra.down").forEach(b=> b.onclick=(e)=>{ e.stopPropagation(); moveStop(+b.dataset.i,1); });
+  el.querySelectorAll(".ra.lock").forEach(b=> b.onclick=(e)=>{ e.stopPropagation(); toggleLock(b.dataset.id); });
   staggerRows(el);
+}
+function moveStop(i,dir){
+  const j=i+dir;
+  if(j<0 || j>=state.stops.length) return;
+  const tmp=state.stops[i]; state.stops[i]=state.stops[j]; state.stops[j]=tmp;
+  state.ordered=null;
+  renderAddrList(); fitMarkers();
+}
+function toggleLock(id){
+  const s=state.stops.find(x=>x.id===id);
+  if(s){ s.locked=!s.locked; state.ordered=null; renderAddrList(); }
 }
 
 function fitMarkers(){
@@ -696,13 +729,15 @@ function runOptimize(){
   const geocoded=state.stops.filter(s=>s.lat!=null);
   if(geocoded.length<2){ toast("Ajoutez au moins 2 adresses valides."); return; }
   const loop = state.returnToStart;
+  const hasLocks = state.stops.some(s=>s.locked);
   const origin={lat:state.stops[0].lat,lng:state.stops[0].lng};
   // si boucle : destination = départ, et tous les autres sont des waypoints
   // sinon : destination = dernier arrêt
   const dest = loop ? origin : {lat:state.stops[state.stops.length-1].lat,lng:state.stops[state.stops.length-1].lng};
   const middle = loop ? state.stops.slice(1) : state.stops.slice(1,-1);
   const waypoints = middle.filter(s=>s.lat!=null).map(s=>({location:{lat:s.lat,lng:s.lng},stopover:true}));
-  dirService.route({ origin, destination:dest, waypoints, optimizeWaypoints:true,
+  // si des arrêts sont verrouillés, on garde l'ordre manuel (pas d'optimisation auto)
+  dirService.route({ origin, destination:dest, waypoints, optimizeWaypoints:!hasLocks,
     travelMode:google.maps.TravelMode.DRIVING },(result,status)=>{
     if(status!=="OK"){ toast("Itinéraire impossible : "+status); return; }
     dirRenderer.setDirections(result);
