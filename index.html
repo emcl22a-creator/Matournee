@@ -166,7 +166,7 @@
   .splash-screen{ position:fixed; inset:0; z-index:99999; background:#000;
     display:flex; align-items:center; justify-content:center; transition:opacity 0.45s ease-out; }
   .splash-screen.hide{ opacity:0; pointer-events:none; }
-  .spinner{ width:44px; height:44px; border-radius:50%;
+  .spinner{ width:38px; height:38px; border-radius:50%;
     border:3px solid rgba(255,255,255,0.15); border-top-color:#fff;
     animation:spin 0.8s linear infinite; }
   @keyframes spin{ to{ transform:rotate(360deg); } }
@@ -220,6 +220,17 @@
   .row-actions .ra[disabled]{ opacity:0.25; }
   .row-actions .ra.lock.on{ color:var(--green); }
   .row-actions .ra.del{ color:#FF6961; }
+
+  /* panneau paramètres */
+  .set-card{ display:flex; align-items:center; gap:14px; background:#2C2C2E; border-radius:14px; padding:14px; margin-bottom:14px; }
+  .set-avatar{ width:48px; height:48px; border-radius:50%; background:var(--green); color:#04130a;
+    display:flex; align-items:center; justify-content:center; font-size:20px; font-weight:700; flex:none; }
+  .set-name{ color:#fff; font-size:16px; font-weight:600; }
+  .set-mail{ color:var(--muted); font-size:13px; }
+  .set-row{ display:flex; justify-content:space-between; align-items:center; padding:13px 4px;
+    border-bottom:1px solid rgba(255,255,255,0.06); color:#fff; font-size:15px; }
+  .set-val{ color:var(--muted); }
+  .set-logout{ background:rgba(255,69,58,0.15); color:#FF453A; margin-top:18px; }
 
   .hidden{ display:none !important; }
 
@@ -297,7 +308,7 @@
     <div class="brand">
       <img id="topLogo" alt="MaTournée" style="height:30px;width:auto;object-fit:contain;">
     </div>
-    <button class="circle-btn" id="logoutBtn" aria-label="Se déconnecter"><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4h3a2 2 0 012 2v12a2 2 0 01-2 2h-3"/><path d="M10 8l-4 4 4 4"/><path d="M6 12h10"/></svg></button>
+    <button class="circle-btn" id="settingsBtn" aria-label="Paramètres"><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 11-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 008 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 11-2.83-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H2a2 2 0 010-4h.09A1.65 1.65 0 003.6 8a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 112.83-2.83l.06.06a1.65 1.65 0 001.82.33H8a1.65 1.65 0 001-1.51V2a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 112.83 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V8a1.65 1.65 0 001.51 1H22a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg></button>
   </div>
 
   <!-- ===== zone scrollable ===== -->
@@ -486,6 +497,31 @@ async function logout(){
   if(sb) await sb.auth.signOut();
   state.user=null;
   document.getElementById("authOverlay").classList.remove("hidden");
+}
+
+/* panneau Paramètres : infos compte + déconnexion */
+function openSettings(){
+  const email = state.user ? (state.user.email||"") : "Non connecté";
+  const name = email && email.includes("@") ? email.split("@")[0] : "";
+  const ov=document.createElement("div"); ov.className="stop-sheet-ov";
+  ov.innerHTML=`
+    <div class="stop-sheet" onclick="event.stopPropagation()">
+      <div class="ss-grab"></div>
+      <div class="ss-title">Paramètres</div>
+      <div class="set-card">
+        <div class="set-avatar">${name?name.charAt(0).toUpperCase():"?"}</div>
+        <div>
+          <div class="set-name">${escapeHtml(name||"Compte")}</div>
+          <div class="set-mail">${escapeHtml(email)}</div>
+        </div>
+      </div>
+      <div class="set-row"><span>Application</span><span class="set-val">MaTournée</span></div>
+      <div class="set-row"><span>Version</span><span class="set-val">1.0</span></div>
+      <button class="btn set-logout" id="setLogout"><svg viewBox="0 0 24 24" width="1.1em" height="1.1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.15em;margin-right:6px;"><path d="M14 4h3a2 2 0 012 2v12a2 2 0 01-2 2h-3"/><path d="M10 8l-4 4 4 4"/><path d="M6 12h10"/></svg>Se déconnecter</button>
+    </div>`;
+  ov.onclick=()=>ov.remove();
+  document.getElementById("app").appendChild(ov);
+  ov.querySelector("#setLogout").onclick=()=>{ ov.remove(); logout(); };
 }
 
 /* ================= SAUVEGARDE ================= */
@@ -954,7 +990,7 @@ function toast(msg){
 /* ================= ÉVÉNEMENTS ================= */
 document.getElementById("authBtn").onclick=doAuth;
 document.getElementById("authPass").addEventListener("keydown",e=>{ if(e.key==="Enter") doAuth(); });
-document.getElementById("logoutBtn").onclick=logout;
+document.getElementById("settingsBtn").onclick=openSettings;
 document.getElementById("addBtn").onclick=addStopManual;
 document.getElementById("loopCheck").addEventListener("change",e=>{ state.returnToStart=e.target.checked; });
 document.getElementById("importBtn").onclick=openImportSheet;
