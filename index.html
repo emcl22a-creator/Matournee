@@ -36,7 +36,7 @@
   }
   /* ===== page principale scrollable (style maquette) ===== */
   #app{ max-width:430px; margin:0 auto; height:100dvh; display:flex; flex-direction:column;
-        padding:env(safe-area-inset-top) 0 0; position:relative; background:transparent; }
+        padding:env(safe-area-inset-top) 0 0; position:relative; background:#000; }
 
   /* barre haut : menu / nom / cloche */
   .topbar{ display:flex; align-items:center; justify-content:space-between; padding:12px 20px 8px; }
@@ -155,12 +155,6 @@
     box-shadow:0 6px 16px rgba(0,0,0,0.55); }
   .logo-box img{ width:72%; height:72%; object-fit:contain; }
 
-  body::before{ content:""; position:fixed; width:140px; height:140vh; border-radius:50%;
-    background:radial-gradient(ellipse, rgba(52,199,89,0.32), transparent 70%);
-    top:-20vh; left:-70px; filter:blur(55px); z-index:0; pointer-events:none; }
-  body::after{ content:""; position:fixed; width:140px; height:140vh; border-radius:50%;
-    background:radial-gradient(ellipse, rgba(52,199,89,0.28), transparent 70%);
-    top:-20vh; right:-70px; filter:blur(55px); z-index:0; pointer-events:none; }
   /* ===== fond étoilé animé ===== */
   .starfield{ position:fixed; inset:0; z-index:0; pointer-events:none; overflow:hidden; }
   .starfield .star{ position:absolute; width:2px; height:2px; border-radius:50%; background:#fff;
@@ -213,6 +207,11 @@
   .ss-status button.on{ background:var(--green); color:#04130a; border-color:var(--green); }
   .ss-save{ background:#fff; color:#000; }
 
+  .import-btn{ width:100%; margin-top:10px; background:transparent; border:1px dashed rgba(255,255,255,0.2);
+    color:var(--muted); font-size:14px; font-weight:500; padding:13px; border-radius:14px;
+    display:flex; align-items:center; justify-content:center; gap:8px; }
+  .import-btn:active{ background:rgba(255,255,255,0.04); }
+
   .hidden{ display:none !important; }
 
   /* ===== ANIMATIONS D'ENTRÉE (style iOS) ===== */
@@ -260,7 +259,6 @@
 <div id="splashScreen" class="splash-screen">
   <div class="spinner"></div>
 </div>
-<div class="starfield" id="starfield" aria-hidden="true"></div>
 <div id="app">
 
   <!-- ===== AUTH (obligatoire) ===== -->
@@ -335,6 +333,7 @@
         <span>Revenir au point de départ</span>
         <span class="switch"><input type="checkbox" id="loopCheck"><span class="slider"></span></span>
       </label>
+      <button class="import-btn" id="importBtn"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12m0 0l-4-4m4 4l4-4M4 17v2a2 2 0 002 2h12a2 2 0 002-2v-2"/></svg> Importer une liste d'adresses</button>
     </div>
 
     <!-- LISTE D'ARRÊTS (saisie + résultat) -->
@@ -355,6 +354,7 @@
 
   <div class="bottombar hidden" id="bottomResult">
     <button class="btn" id="navBtn"><svg viewBox="0 0 24 24" width="1.2em" height="1.2em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l8 18-8-4-8 4z"/></svg> Démarrer la tournée</button>
+    <button class="btn dots" id="shareBtn" aria-label="Partager"><svg viewBox="0 0 24 24" width="1.1em" height="1.1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8"/><path d="M16 6l-4-4-4 4"/><path d="M12 2v14"/></svg></button>
     <button class="btn dots" id="editBtn">···</button>
   </div>
 
@@ -568,6 +568,78 @@ function addStopGeocoded(desc, placeId){
 }
 
 /* ================= STOPS ================= */
+/* ===== IMPORT d'une liste d'adresses ===== */
+function openImportSheet(){
+  const ov=document.createElement("div"); ov.className="stop-sheet-ov";
+  ov.innerHTML=`
+    <div class="stop-sheet" onclick="event.stopPropagation()">
+      <div class="ss-grab"></div>
+      <div class="ss-title">Importer des adresses</div>
+      <label class="ss-label">Collez vos adresses, une par ligne</label>
+      <textarea class="ss-note" id="impText" style="min-height:140px;" placeholder="12 Rue de Rivoli, Paris&#10;8 Rue Saint-Honoré, Paris&#10;45 Avenue de l'Opéra, Paris"></textarea>
+      <button class="btn ss-save" id="impGo">Ajouter ces adresses</button>
+    </div>`;
+  ov.onclick=()=>ov.remove();
+  document.getElementById("app").appendChild(ov);
+  ov.querySelector("#impGo").onclick=()=>{
+    const lines=ov.querySelector("#impText").value.split("\n").map(l=>l.trim()).filter(l=>l);
+    if(!lines.length){ ov.remove(); return; }
+    ov.remove();
+    importAddresses(lines);
+  };
+}
+function importAddresses(lines){
+  toast("Import de "+lines.length+" adresses…");
+  let done=0;
+  lines.forEach(line=>{
+    if(geocoder){
+      geocoder.geocode({ address:line, componentRestrictions:{country:["fr","ch"]} },(res,st)=>{
+        if(st==="OK" && res[0]){
+          const loc=res[0].geometry.location;
+          state.counter++;
+          state.stops.push({ id:"s"+state.counter, name:res[0].formatted_address, lat:loc.lat(), lng:loc.lng(), note:"", status:"" });
+        } else {
+          state.counter++;
+          state.stops.push({ id:"s"+state.counter, name:line, lat:null, lng:null, note:"", status:"" });
+        }
+        done++;
+        if(done===lines.length){ state.ordered=null; showMode("input"); fitMarkers(); toast(lines.length+" adresses ajoutées ✓"); }
+      });
+    } else {
+      state.counter++;
+      state.stops.push({ id:"s"+state.counter, name:line, lat:null, lng:null, note:"", status:"" });
+      done++;
+      if(done===lines.length){ state.ordered=null; showMode("input"); }
+    }
+  });
+}
+
+/* ===== PARTAGER la tournée ===== */
+function shareTour(){
+  const seq = state.ordered ? state.ordered.order : state.stops.map((_,i)=>i);
+  if(!seq.length){ toast("Aucune tournée à partager."); return; }
+  let txt="🚚 Ma tournée MaTournée\n\n";
+  seq.forEach((idx,i)=>{
+    const s=state.stops[idx];
+    txt += (i+1)+". "+s.name + (s.note?(" — "+s.note):"") + "\n";
+  });
+  if(state.ordered){
+    txt += "\n⏱ "+document.getElementById("rTime").textContent+" · "+document.getElementById("rDist").textContent;
+  }
+  // lien Google Maps avec les arrêts
+  const pts=seq.map(idx=>state.stops[idx]).filter(s=>s.lat!=null);
+  if(pts.length){
+    const wp=pts.map(s=>s.lat+","+s.lng).join("/");
+    txt += "\n\n🗺 Itinéraire : https://www.google.com/maps/dir/"+wp;
+  }
+  if(navigator.share){
+    navigator.share({ title:"Ma tournée", text:txt }).catch(()=>{});
+  } else {
+    navigator.clipboard.writeText(txt).then(()=>toast("Tournée copiée ✓ Collez-la où vous voulez."))
+      .catch(()=>toast("Impossible de copier."));
+  }
+}
+
 function pushStop(name,lat,lng){
   state.counter++;
   state.stops.push({ id:"s"+state.counter, name, lat, lng, note:"", status:"" });
@@ -847,6 +919,8 @@ document.getElementById("authPass").addEventListener("keydown",e=>{ if(e.key==="
 document.getElementById("logoutBtn").onclick=logout;
 document.getElementById("addBtn").onclick=addStopManual;
 document.getElementById("loopCheck").addEventListener("change",e=>{ state.returnToStart=e.target.checked; });
+document.getElementById("importBtn").onclick=openImportSheet;
+document.getElementById("shareBtn").onclick=shareTour;
 document.getElementById("addrInput").addEventListener("input",e=>onAddrInput(e.target.value));
 document.getElementById("addrInput").addEventListener("keydown",e=>{ if(e.key==="Enter"){ hideSug(); addStopManual(); }});
 document.getElementById("optBtn").onclick=runOptimize;
@@ -857,21 +931,6 @@ document.getElementById("stopNavBtn").onclick=stopNav;
 document.getElementById("locBtn").onclick=centerOnMe;
 
 /* ================= DÉMARRAGE ================= */
-function genererEtoiles(){
-  const sf=document.getElementById("starfield");
-  if(!sf) return;
-  const N=50; // 30 de moins que Frizz
-  let html="";
-  for(let i=0;i<N;i++){
-    const x=Math.random()*100, y=Math.random()*100;
-    const delay=(Math.random()*3 - 1.5).toFixed(2);
-    const dur=(2+Math.random()*2.5).toFixed(2);
-    const sz=(Math.random()*1.5+1).toFixed(1);
-    html+=`<span class="star" style="left:${x}%;top:${y}%;width:${sz}px;height:${sz}px;animation-delay:${delay}s;animation-duration:${dur}s;"></span>`;
-  }
-  sf.innerHTML=html;
-}
-genererEtoiles();
 /* splash : disparition après 1,5s */
 (function(){
   const splash=document.getElementById("splashScreen");
