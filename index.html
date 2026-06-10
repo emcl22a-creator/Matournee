@@ -110,7 +110,7 @@
 
   /* barre du bas fixe : bouton démarrer + ··· */
   .bottombar{ display:flex; gap:10px; padding:12px 20px calc(14px + env(safe-area-inset-bottom)); }
-  .btn{ border:none; border-radius:16px; font-size:17px; font-weight:600; padding:16px; flex:1; letter-spacing:-0.2px;
+  .btn{ border:none; border-radius:var(--rl); font-size:17px; font-weight:600; padding:16px; flex:1; letter-spacing:-0.2px;
     color:#000; background:#fff; display:flex; align-items:center; justify-content:center; gap:9px;
     transition:transform .12s ease, opacity .12s ease; }
   .btn:active{ transform:scale(0.97); }
@@ -208,7 +208,7 @@
   .ss-save{ background:#fff; color:#000; }
 
   .import-btn{ width:100%; margin-top:10px; background:transparent; border:1px dashed rgba(255,255,255,0.2);
-    color:var(--muted); font-size:14px; font-weight:500; padding:13px; border-radius:14px;
+    color:var(--muted); font-size:14px; font-weight:500; padding:13px; border-radius:var(--rl);
     display:flex; align-items:center; justify-content:center; gap:8px; }
   .import-btn:active{ background:rgba(255,255,255,0.04); }
 
@@ -231,6 +231,19 @@
     border-bottom:1px solid rgba(255,255,255,0.06); color:#fff; font-size:15px; }
   .set-val{ color:var(--muted); }
   .set-logout{ background:rgba(255,69,58,0.15); color:#FF453A; margin-top:18px; }
+
+  /* ===== animation d'ouverture iOS de la page ===== */
+  @keyframes iosRise{ from{ opacity:0; transform:translateY(16px); } to{ opacity:1; transform:translateY(0); } }
+  .app-enter .topbar{ animation:iosRise .55s cubic-bezier(.22,1,.36,1) .02s both; }
+  .app-enter .scroll > *{ animation:iosRise .55s cubic-bezier(.22,1,.36,1) both; }
+  .app-enter .scroll > .greeting{ animation-delay:.06s; }
+  .app-enter .scroll > .page-title{ animation-delay:.10s; }
+  .app-enter .scroll > .subtitle{ animation-delay:.14s; }
+  .app-enter .scroll > .statbar{ animation-delay:.18s; }
+  .app-enter .scroll > .mapcard{ animation-delay:.24s; }
+  .app-enter .scroll > #viewInput{ animation-delay:.30s; }
+  .app-enter .scroll > #stoplist{ animation-delay:.34s; }
+  .app-enter .bottombar{ animation:iosRise .55s cubic-bezier(.22,1,.36,1) .36s both; }
 
   .hidden{ display:none !important; }
 
@@ -306,7 +319,7 @@
   <!-- ===== barre haut ===== -->
   <div class="topbar">
     <div class="brand">
-      <img id="topLogo" alt="MaTournée" style="height:30px;width:auto;object-fit:contain;">
+      <img id="topLogo" alt="MaTournée" style="height:38px;width:auto;object-fit:contain;">
     </div>
     <button class="circle-btn" id="settingsBtn" aria-label="Paramètres"><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 11-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 008 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 11-2.83-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H2a2 2 0 010-4h.09A1.65 1.65 0 003.6 8a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 112.83-2.83l.06.06a1.65 1.65 0 001.82.33H8a1.65 1.65 0 001-1.51V2a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 112.83 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V8a1.65 1.65 0 001.51 1H22a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg></button>
   </div>
@@ -1005,11 +1018,16 @@ document.getElementById("stopNavBtn").onclick=stopNav;
 document.getElementById("locBtn").onclick=centerOnMe;
 
 /* ================= DÉMARRAGE ================= */
-/* splash : disparition après 1,5s */
+/* splash : disparition après 1,5s + animation d'ouverture iOS de la page */
 (function(){
   const splash=document.getElementById("splashScreen");
   if(splash){
-    setTimeout(()=>{ splash.classList.add("hide"); setTimeout(()=>splash.remove(),500); }, 1500);
+    setTimeout(()=>{
+      splash.classList.add("hide");
+      const app=document.getElementById("app");
+      if(app){ app.classList.add("app-enter"); setTimeout(()=>app.classList.remove("app-enter"),1400); }
+      setTimeout(()=>splash.remove(),500);
+    }, 1500);
   }
 })();
 initSupabase();
