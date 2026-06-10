@@ -36,7 +36,7 @@
   }
   /* ===== page principale scrollable (style maquette) ===== */
   #app{ max-width:430px; margin:0 auto; height:100dvh; display:flex; flex-direction:column;
-        padding:env(safe-area-inset-top) 0 0; position:relative; background:#000; }
+        padding:env(safe-area-inset-top) 0 0; position:relative; background:transparent; }
 
   /* barre haut : menu / nom / cloche */
   .topbar{ display:flex; align-items:center; justify-content:space-between; padding:12px 20px 8px; }
@@ -86,7 +86,9 @@
   .stop .num.start{ background:var(--green); border-color:var(--green); }
   .stop .num.done{ background:#2C2C2E; border-color:#2C2C2E; color:var(--muted); }
   .stop .info{ flex:1; min-width:0; }
-  .stop .addr{ color:#fff; font-size:16px; font-weight:400; line-height:1.3; letter-spacing:-0.2px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .stop .addr{ color:#fff; font-size:16px; font-weight:400; line-height:1.3; letter-spacing:-0.2px; display:flex; align-items:center; min-width:0; }
+  .stop .addr .addr-txt{ overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .stop .badge{ flex:none; }
   .stop .eta{ color:var(--muted); font-size:13px; font-weight:400; margin-top:2px; letter-spacing:-0.1px; }
   .stop .time{ color:#fff; font-size:16px; font-weight:600; margin-right:6px; letter-spacing:-0.2px; }
   .stop .chev{ color:var(--muted); font-size:16px; }
@@ -153,6 +155,12 @@
     box-shadow:0 6px 16px rgba(0,0,0,0.55); }
   .logo-box img{ width:72%; height:72%; object-fit:contain; }
 
+  body::before{ content:""; position:fixed; width:140px; height:140vh; border-radius:50%;
+    background:radial-gradient(ellipse, rgba(52,199,89,0.32), transparent 70%);
+    top:-20vh; left:-70px; filter:blur(55px); z-index:0; pointer-events:none; }
+  body::after{ content:""; position:fixed; width:140px; height:140vh; border-radius:50%;
+    background:radial-gradient(ellipse, rgba(52,199,89,0.28), transparent 70%);
+    top:-20vh; right:-70px; filter:blur(55px); z-index:0; pointer-events:none; }
   /* ===== fond étoilé animé ===== */
   .starfield{ position:fixed; inset:0; z-index:0; pointer-events:none; overflow:hidden; }
   .starfield .star{ position:absolute; width:2px; height:2px; border-radius:50%; background:#fff;
@@ -160,19 +168,50 @@
   @keyframes twinkle{ 0%,100%{ opacity:0.15; transform:scale(0.8); } 50%{ opacity:0.9; transform:scale(1.2); } }
   #app{ position:relative; z-index:1; }
 
-  /* ===== splash screen (effet d'ouverture) ===== */
+  /* ===== écran de chargement : roue qui tourne ===== */
   .splash-screen{ position:fixed; inset:0; z-index:99999; background:#000;
     display:flex; align-items:center; justify-content:center; transition:opacity 0.45s ease-out; }
   .splash-screen.hide{ opacity:0; pointer-events:none; }
-  .splash-content{ display:flex; flex-direction:column; align-items:center; gap:16px;
-    animation:splashFadeIn 0.45s ease-out; }
-  .splash-logo{ width:120px; height:120px; object-fit:contain; display:block;
-    animation:splashLogoFloat 2.2s ease-in-out infinite; }
-  .splash-text{ font-size:30px; font-weight:700; color:#fff; letter-spacing:-0.5px;
-    animation:splashTextFadeIn 0.6s ease-out 0.2s backwards; }
-  @keyframes splashFadeIn{ from{ opacity:0; transform:scale(0.96); } to{ opacity:1; transform:scale(1); } }
-  @keyframes splashLogoFloat{ 0%,100%{ transform:translateY(0); } 50%{ transform:translateY(-10px); } }
-  @keyframes splashTextFadeIn{ from{ opacity:0; transform:translateY(8px); } to{ opacity:1; transform:translateY(0); } }
+  .spinner{ width:44px; height:44px; border-radius:50%;
+    border:3px solid rgba(255,255,255,0.15); border-top-color:#fff;
+    animation:spin 0.8s linear infinite; }
+  @keyframes spin{ to{ transform:rotate(360deg); } }
+
+  /* badges statut */
+  .badge{ font-size:11px; font-weight:600; padding:2px 8px; border-radius:8px; margin-left:6px; vertical-align:middle; }
+  .badge.bdone{ background:rgba(52,199,89,0.2); color:#34C759; }
+  .badge.bfail{ background:rgba(255,69,58,0.2); color:#FF453A; }
+  .badge.blater{ background:rgba(255,159,10,0.2); color:#FF9F0A; }
+
+  /* toggle retour au départ */
+  .loop-toggle{ display:flex; align-items:center; justify-content:space-between; padding:4px 6px 0;
+    color:#fff; font-size:15px; margin-bottom:6px; }
+  .switch{ position:relative; display:inline-block; width:48px; height:28px; }
+  .switch input{ opacity:0; width:0; height:0; }
+  .slider{ position:absolute; inset:0; background:#39393D; border-radius:28px; transition:.25s; }
+  .slider:before{ content:""; position:absolute; width:24px; height:24px; left:2px; top:2px;
+    background:#fff; border-radius:50%; transition:.25s; }
+  .switch input:checked + .slider{ background:var(--green); }
+  .switch input:checked + .slider:before{ transform:translateX(20px); }
+
+  /* feuille d'un arrêt */
+  .stop-sheet-ov{ position:fixed; inset:0; z-index:200; background:rgba(0,0,0,0.5);
+    display:flex; align-items:flex-end; justify-content:center; animation:fadeIn .2s ease; }
+  .stop-sheet{ background:#1A1A1E; border-radius:24px 24px 0 0; padding:18px 18px calc(20px + env(safe-area-inset-bottom));
+    width:100%; max-width:430px; border-top:1px solid rgba(255,255,255,0.1); animation:sheetUp .3s cubic-bezier(.22,1,.36,1); }
+  @keyframes sheetUp{ from{ transform:translateY(100%); } to{ transform:translateY(0); } }
+  .ss-grab{ width:38px; height:5px; border-radius:3px; background:rgba(255,255,255,0.25); margin:0 auto 14px; }
+  .ss-title{ color:#fff; font-size:17px; font-weight:600; margin-bottom:14px; }
+  .ss-label{ display:block; color:var(--muted); font-size:13px; margin:0 0 6px; }
+  .ss-note{ width:100%; box-sizing:border-box; background:#2C2C2E; border:1px solid rgba(255,255,255,0.1);
+    outline:none; color:#fff; font-size:15px; padding:12px; border-radius:12px; min-height:60px; resize:none;
+    margin-bottom:14px; font-family:inherit; }
+  .ss-status{ display:flex; gap:8px; margin-bottom:16px; }
+  .ss-status button{ flex:1; background:#2C2C2E; border:1px solid rgba(255,255,255,0.1); color:#fff;
+    font-size:13px; font-weight:600; padding:11px 6px; border-radius:12px; display:flex; align-items:center;
+    justify-content:center; gap:4px; }
+  .ss-status button.on{ background:var(--green); color:#04130a; border-color:var(--green); }
+  .ss-save{ background:#fff; color:#000; }
 
   .hidden{ display:none !important; }
 
@@ -219,10 +258,7 @@
 </head>
 <body>
 <div id="splashScreen" class="splash-screen">
-  <div class="splash-content">
-    <img id="splashLogo" alt="MaTournée" class="splash-logo"/>
-    <div class="splash-text">MaTournée</div>
-  </div>
+  <div class="spinner"></div>
 </div>
 <div class="starfield" id="starfield" aria-hidden="true"></div>
 <div id="app">
@@ -295,6 +331,10 @@
         <button class="add-inline" id="addBtn" aria-label="Ajouter l'adresse"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg></button>
         <div class="suggestions" id="suggestions"></div>
       </div>
+      <label class="loop-toggle" id="loopToggle">
+        <span>Revenir au point de départ</span>
+        <span class="switch"><input type="checkbox" id="loopCheck"><span class="slider"></span></span>
+      </label>
     </div>
 
     <!-- LISTE D'ARRÊTS (saisie + résultat) -->
@@ -357,7 +397,7 @@ const ICON_PATHS = {
 function ic(name){
   return '<svg viewBox="0 0 24 24" width="1em" height="1em" style="vertical-align:-0.125em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">'+(ICON_PATHS[name]||'')+'</svg>';
 }
-const state = { stops:[], ordered:null, counter:0, navIndex:0, mapsReady:false, user:null };
+const state = { stops:[], ordered:null, counter:0, navIndex:0, mapsReady:false, user:null, returnToStart:false };
 let sb=null, gmap=null, dirService=null, dirRenderer=null, geocoder=null, autocomplete=null;
 let placesService=null, acService=null, meMarker=null, watchId=null, markers=[];
 
@@ -530,7 +570,7 @@ function addStopGeocoded(desc, placeId){
 /* ================= STOPS ================= */
 function pushStop(name,lat,lng){
   state.counter++;
-  state.stops.push({ id:"s"+state.counter, name, lat, lng });
+  state.stops.push({ id:"s"+state.counter, name, lat, lng, note:"", status:"" });
   state.ordered=null;
   document.getElementById("addrInput").value="";
   showMode("input"); fitMarkers();
@@ -583,18 +623,27 @@ function runOptimize(){
   if(!state.mapsReady || !dirService){ toast("Ajoutez la clé Google Maps pour optimiser."); return; }
   const geocoded=state.stops.filter(s=>s.lat!=null);
   if(geocoded.length<2){ toast("Ajoutez au moins 2 adresses valides."); return; }
+  const loop = state.returnToStart;
   const origin={lat:state.stops[0].lat,lng:state.stops[0].lng};
-  const dest={lat:state.stops[state.stops.length-1].lat,lng:state.stops[state.stops.length-1].lng};
-  const waypoints=state.stops.slice(1,-1).filter(s=>s.lat!=null)
-    .map(s=>({location:{lat:s.lat,lng:s.lng},stopover:true}));
+  // si boucle : destination = départ, et tous les autres sont des waypoints
+  // sinon : destination = dernier arrêt
+  const dest = loop ? origin : {lat:state.stops[state.stops.length-1].lat,lng:state.stops[state.stops.length-1].lng};
+  const middle = loop ? state.stops.slice(1) : state.stops.slice(1,-1);
+  const waypoints = middle.filter(s=>s.lat!=null).map(s=>({location:{lat:s.lat,lng:s.lng},stopover:true}));
   dirService.route({ origin, destination:dest, waypoints, optimizeWaypoints:true,
     travelMode:google.maps.TravelMode.DRIVING },(result,status)=>{
     if(status!=="OK"){ toast("Itinéraire impossible : "+status); return; }
     dirRenderer.setDirections(result);
     const r=result.routes[0];
     let m=0,sec=0; const legSecs=[]; r.legs.forEach(l=>{ m+=l.distance.value; sec+=l.duration.value; legSecs.push(l.duration.value); });
-    const order=[0].concat(r.waypoint_order.map(i=>i+1)).concat([state.stops.length-1]);
-    state.ordered={ order, result, dist:m, time:sec, legSecs };
+    // ordre des arrêts (indices dans state.stops)
+    let order;
+    if(loop){
+      order=[0].concat(r.waypoint_order.map(i=>i+1));
+    } else {
+      order=[0].concat(r.waypoint_order.map(i=>i+1)).concat([state.stops.length-1]);
+    }
+    state.ordered={ order, result, dist:m, time:sec, legSecs, loop };
     const h=Math.floor(sec/3600), min=Math.round((sec%3600)/60);
     document.getElementById("rTime").textContent = h>0 ? (h+"h "+min+"min") : (min+" min");
     document.getElementById("rDist").textContent=(m/1000).toFixed(1).replace(".",",")+" km";
@@ -616,19 +665,70 @@ function computeETAs(){
   return etas;
 }
 
+function statusBadge(st){
+  if(st==="done") return '<span class="badge bdone">Livré</span>';
+  if(st==="fail") return '<span class="badge bfail">Échec</span>';
+  if(st==="later") return '<span class="badge blater">Reporté</span>';
+  return '';
+}
 function renderResultList(){
   const el=document.getElementById("stoplist"); el.innerHTML=""; el.style.display="block";
   const etas=computeETAs();
   state.ordered.order.forEach((idx,i)=>{
     const s=state.stops[idx];
-    const done=i<state.navIndex;
-    const row=document.createElement("div"); row.className="stop";
-    row.innerHTML=`<span class="num ${i===0&&state.navIndex===0?'start':''} ${done?'done':''}">${done?ic('check'):(i+1)}</span>
-      <div class="info"><div class="addr">${escapeHtml(s.name)}</div><div class="eta">ETA ${etas[i]}</div></div>
+    const navDone=i<state.navIndex;
+    const row=document.createElement("div"); row.className="stop"; row.style.cursor="pointer";
+    const note = s.note ? `<div class="eta" style="color:#8E8E93;">📝 ${escapeHtml(s.note)}</div>` : "";
+    row.innerHTML=`<span class="num ${i===0&&state.navIndex===0?'start':''} ${navDone?'done':''}">${navDone?ic('check'):(i+1)}</span>
+      <div class="info"><div class="addr"><span class="addr-txt">${escapeHtml(s.name)}</span> ${statusBadge(s.status)}</div><div class="eta">ETA ${etas[i]}</div>${note}</div>
       <span class="time">${etas[i]}</span><span class="chev">›</span>`;
+    row.onclick=()=>openStopSheet(idx);
     el.appendChild(row);
   });
+  // ligne retour au départ si boucle
+  if(state.ordered.loop){
+    const s=state.stops[0];
+    const row=document.createElement("div"); row.className="stop";
+    row.innerHTML=`<span class="num start">${ic('flag')}</span>
+      <div class="info"><div class="addr">Retour — ${escapeHtml(s.name)}</div><div class="eta">Fin de tournée</div></div>`;
+    el.appendChild(row);
+  }
   staggerRows(el);
+}
+
+/* feuille d'un arrêt : note + statut */
+function openStopSheet(idx){
+  const s=state.stops[idx];
+  const ov=document.createElement("div"); ov.className="stop-sheet-ov";
+  ov.innerHTML=`
+    <div class="stop-sheet" onclick="event.stopPropagation()">
+      <div class="ss-grab"></div>
+      <div class="ss-title">${escapeHtml(s.name)}</div>
+      <label class="ss-label">Note</label>
+      <textarea class="ss-note" id="ssNote" placeholder="Code portail, étage, instructions…">${escapeHtml(s.note||"")}</textarea>
+      <label class="ss-label">Statut</label>
+      <div class="ss-status">
+        <button data-st="done" class="${s.status==='done'?'on':''}">${ic('check')} Livré</button>
+        <button data-st="fail" class="${s.status==='fail'?'on':''}">Échec</button>
+        <button data-st="later" class="${s.status==='later'?'on':''}">Reporté</button>
+      </div>
+      <button class="btn ss-save" id="ssSave">Enregistrer</button>
+    </div>`;
+  ov.onclick=()=>ov.remove();
+  document.getElementById("app").appendChild(ov);
+  let chosen=s.status||"";
+  ov.querySelectorAll(".ss-status button").forEach(b=>{
+    b.onclick=()=>{ chosen = (chosen===b.dataset.st)?"":b.dataset.st;
+      ov.querySelectorAll(".ss-status button").forEach(x=>x.classList.remove("on"));
+      if(chosen) b.classList.add("on"); };
+  });
+  ov.querySelector("#ssSave").onclick=()=>{
+    s.note=ov.querySelector("#ssNote").value.trim();
+    s.status=chosen;
+    ov.remove();
+    if(state.ordered) renderResultList(); else renderAddrList();
+    saveTour();
+  };
 }
 
 /* ================= NAVIGATION IN-APP ================= */
@@ -746,6 +846,7 @@ document.getElementById("authBtn").onclick=doAuth;
 document.getElementById("authPass").addEventListener("keydown",e=>{ if(e.key==="Enter") doAuth(); });
 document.getElementById("logoutBtn").onclick=logout;
 document.getElementById("addBtn").onclick=addStopManual;
+document.getElementById("loopCheck").addEventListener("change",e=>{ state.returnToStart=e.target.checked; });
 document.getElementById("addrInput").addEventListener("input",e=>onAddrInput(e.target.value));
 document.getElementById("addrInput").addEventListener("keydown",e=>{ if(e.key==="Enter"){ hideSug(); addStopManual(); }});
 document.getElementById("optBtn").onclick=runOptimize;
@@ -771,10 +872,8 @@ function genererEtoiles(){
   sf.innerHTML=html;
 }
 genererEtoiles();
-/* splash : logo + disparition après 1,5s */
+/* splash : disparition après 1,5s */
 (function(){
-  const sl=document.getElementById("splashLogo");
-  if(sl) sl.src=LOGO_URI_WHITE;
   const splash=document.getElementById("splashScreen");
   if(splash){
     setTimeout(()=>{ splash.classList.add("hide"); setTimeout(()=>splash.remove(),500); }, 1500);
