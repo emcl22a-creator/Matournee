@@ -39,8 +39,7 @@
   @keyframes chaloBreath3{0%,100%{transform:translateX(-50%) scale(1); opacity:0.8;}50%{transform:translateX(-50%) scale(1.15); opacity:1;}}
 
   .app{ position:relative; z-index:1; width:100%; max-width:460px; margin:0 auto; min-height:100vh; padding-bottom:120px; }
-  .topbar{ position:sticky; top:0; z-index:15; padding:16px 20px 12px;
-    background:rgba(20,21,24,0.82); -webkit-backdrop-filter:blur(16px); backdrop-filter:blur(16px); }
+  .topbar{ position:sticky; top:0; z-index:15; padding:16px 20px 12px; }
   .brand .mark svg{ width:26px; height:29px; animation: logoBreath 4s ease-in-out infinite; }
   @keyframes logoBreath{
     0%,100%{ transform:scale(1); }
@@ -49,21 +48,12 @@
 
   .topbar-card{
     display:flex; align-items:center; justify-content:space-between; gap:10px;
-    background:var(--bg-card); -webkit-backdrop-filter:blur(20px) saturate(180%); backdrop-filter:blur(20px) saturate(180%);
-    border:0.5px solid var(--border); border-radius:24px; padding:10px 12px 10px 14px;
-    box-shadow:0 6px 20px rgba(0,0,0,0.22);
   }
   .topbar-left{ display:flex; align-items:center; gap:12px; }
   .logo-pill{
-    width:44px; height:44px; border-radius:50%; display:flex; align-items:center; justify-content:center; flex-shrink:0;
-    background:
-      linear-gradient(180deg, rgba(255,255,255,0.18), rgba(255,255,255,0) 45%),
-      rgba(255,255,255,0.08);
-    box-shadow:
-      0 1px 1px rgba(255,255,255,0.15) inset,
-      0 -4px 8px rgba(0,0,0,0.25) inset;
+    display:flex; align-items:center; justify-content:center; flex-shrink:0;
   }
-  .logo-pill svg{ width:18px; height:21px; }
+  .logo-pill svg{ width:22px; height:26px; }
   .topbar-title{ display:flex; flex-direction:column; line-height:1.2; }
   .topbar-title .name{ font-size:15.5px; font-weight:700; }
   .topbar-title .role{ font-size:12px; color:var(--label-2); font-weight:500; }
@@ -1280,19 +1270,49 @@ function escapeHtml(str) {
 }
 
 // ═══ RESTER CONNECTÉ : vérifie s'il existe déjà une session au chargement ═══
-;(async function checkExistingSession() {
-  const { data: { session } } = await supabase.auth.getSession()
-  if (session) {
-    const { data: membre, error } = await supabase
-      .from('membres').select('*').eq('user_id', session.user.id).maybeSingle()
-    if (membre) {
-      enterApp(membre)
-      return
+try {
+  ;(async function checkExistingSession() {
+    try {
+      const { data: { session } } = await supabase.auth.getSession()
+      if (session) {
+        const { data: membre } = await supabase
+          .from('membres').select('*').eq('user_id', session.user.id).maybeSingle()
+        if (membre) {
+          enterApp(membre)
+          window.__procedoLoaded = true
+          return
+        }
+      }
+    } catch (e) {
+      console.error('Erreur de vérification de session :', e)
     }
-  }
-  // Pas de session valide : afficher l'écran de choix d'espace
+    // Pas de session valide (ou erreur) : afficher l'écran de choix d'espace
+    document.getElementById('choice-screen').style.display = 'flex'
+    window.__procedoLoaded = true
+  })()
+} catch (e) {
+  console.error('Erreur au chargement :', e)
   document.getElementById('choice-screen').style.display = 'flex'
-})()
+}
+</script>
+
+<!-- Filet de sécurité : si le script principal (module) échoue à charger
+     (réseau, bloqueur de pub, etc.), on force l'affichage après 4 secondes -->
+<script>
+  setTimeout(function() {
+    if (!window.__procedoLoaded) {
+      var choice = document.getElementById('choice-screen')
+      var login = document.getElementById('login-screen')
+      var gestion = document.getElementById('gestion-app')
+      var equipe = document.getElementById('equipe-app')
+      var loginVisible = login && login.style.display === 'flex'
+      var gestionVisible = gestion && gestion.style.display === 'block'
+      var equipeVisible = equipe && equipe.style.display === 'block'
+      if (!loginVisible && !gestionVisible && !equipeVisible && choice) {
+        choice.style.display = 'flex'
+      }
+    }
+  }, 4000)
 </script>
 
 </body>
