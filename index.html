@@ -173,7 +173,7 @@
   .detail-step p{font-size:14px; line-height:1.4;}
   .confirm-bar{ margin-top:20px; }
 
-  .search-bar{ display:flex; align-items:center; gap:8px; background:var(--bg-card); border:0.5px solid var(--border); border-radius:100px; padding:8px 14px; margin-bottom:16px; }
+  .search-bar{ display:flex; align-items:center; gap:8px; background:var(--bg-card); border:0.5px solid var(--border); border-radius:100px; padding:5px 14px; margin-bottom:14px; }
   .search-bar svg{width:15px; height:15px; color:var(--label-2); flex-shrink:0;}
   .search-bar input{background:none; border:none; font-size:16px; width:100%;}
 
@@ -781,9 +781,29 @@ window.openSettings = async function() {
   const { data: userData } = await supabase.auth.getUser()
   document.getElementById('settings-email').value = userData?.user?.email || ''
 
-  const { data: entreprise } = await supabase
+  document.getElementById('settings-code').textContent = '...'
+  const { data: entreprise, error: entrepriseError } = await supabase
     .from('entreprises').select('code_acces').eq('id', currentMembre.entreprise_id).maybeSingle()
-  document.getElementById('settings-code').textContent = entreprise?.code_acces || '—'
+
+  if (entrepriseError) {
+    console.error('Erreur chargement code entreprise :', entrepriseError)
+    document.getElementById('settings-code').textContent = '—'
+    return
+  }
+
+  if (entreprise && entreprise.code_acces) {
+    document.getElementById('settings-code').textContent = entreprise.code_acces
+  } else {
+    // Cette entreprise n'a pas encore de code (créée avant l'ajout de cette fonctionnalité) : on en génère un
+    let nouveauCode = null
+    for (let tentative = 0; tentative < 5 && !nouveauCode; tentative++) {
+      const code = String(Math.floor(10000 + Math.random() * 90000))
+      const { error: updateError } = await supabase
+        .from('entreprises').update({ code_acces: code }).eq('id', currentMembre.entreprise_id)
+      if (!updateError) nouveauCode = code
+    }
+    document.getElementById('settings-code').textContent = nouveauCode || '—'
+  }
 }
 
 document.getElementById('copy-code-btn').addEventListener('click', () => {
