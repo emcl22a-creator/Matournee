@@ -47,6 +47,27 @@
   }
   .role-tag{ font-size:11px; font-weight:600; color:var(--label-2); background:var(--bg-card); border:0.5px solid var(--border); padding:4px 10px; border-radius:100px; }
 
+  .topbar-right{ display:flex; align-items:center; gap:8px; }
+  .logo-pill{
+    width:38px; height:38px; border-radius:50%; display:flex; align-items:center; justify-content:center;
+    background:
+      linear-gradient(180deg, rgba(255,255,255,0.18), rgba(255,255,255,0) 45%),
+      rgba(255,255,255,0.08);
+    border:0.5px solid var(--border);
+    box-shadow:
+      0 1px 1px rgba(255,255,255,0.15) inset,
+      0 -4px 8px rgba(0,0,0,0.25) inset,
+      0 4px 10px rgba(0,0,0,0.25);
+  }
+  .logo-pill svg{ width:16px; height:19px; }
+  .icon-pill{
+    width:32px; height:32px; border-radius:50%; display:flex; align-items:center; justify-content:center;
+    background:var(--bg-card); border:0.5px solid var(--border); color:var(--label);
+    transition: transform 0.18s cubic-bezier(0.34,1.56,0.64,1), background 0.2s;
+  }
+  .icon-pill:active{ transform:scale(0.88); background:rgba(255,255,255,0.14); }
+  .icon-pill svg{ width:16px; height:16px; }
+
   .screen{display:none; padding:0 20px 40px;}
   .screen.active{ display:block; animation: screenIn 0.5s cubic-bezier(0.32,0.72,0,1); }
   @keyframes screenIn{
@@ -134,6 +155,19 @@
   .qr-visual canvas{width:100%; height:100%;}
   .qr-info{ flex:1; }
 
+  .plan-card{
+    background:var(--bg-card); -webkit-backdrop-filter:blur(20px) saturate(180%); backdrop-filter:blur(20px) saturate(180%);
+    border:0.5px solid var(--border); border-radius:16px; padding:14px 16px; margin-bottom:8px;
+    transition: transform 0.18s cubic-bezier(0.34,1.56,0.64,1), border-color 0.2s;
+  }
+  .plan-card.active{ border-color:rgba(255,255,255,0.5); }
+  .plan-card:active{ transform:scale(0.98); }
+  .plan-head{ display:flex; justify-content:space-between; align-items:center; }
+  .plan-name{ font-size:15px; font-weight:700; display:flex; align-items:center; }
+  .plan-price{ font-size:15px; font-weight:700; }
+  .plan-price span{ font-size:11px; font-weight:500; color:var(--label-2); }
+  .plan-desc{ font-size:12px; color:var(--label-2); margin-top:4px; }
+
   .detail-header{ display:flex; align-items:center; gap:10px; margin-bottom:4px; padding-top:2px; }
   .back-btn{ width:34px; height:34px; border-radius:50%; display:flex; align-items:center; justify-content:center; background:var(--bg-card); border:0.5px solid var(--border); flex-shrink:0; }
   .back-btn svg{width:16px; height:16px;}
@@ -164,6 +198,29 @@
   .login-wrap{ display:flex; align-items:center; justify-content:center; min-height:100vh; padding:24px; }
   .login-card{ width:100%; max-width:360px; background:var(--bg-card); border:0.5px solid var(--border); border-radius:20px; padding:28px 24px;
     -webkit-backdrop-filter:blur(20px) saturate(180%); backdrop-filter:blur(20px) saturate(180%); }
+
+  .auth-toggle{
+    position:relative; display:flex; gap:0; background:rgba(255,255,255,0.06); border:0.5px solid var(--border);
+    border-radius:100px; padding:4px; margin-bottom:22px;
+  }
+  .auth-toggle-indicator{
+    position:absolute; top:4px; left:4px; width:calc(50% - 4px); height:calc(100% - 8px);
+    background:#fff; border-radius:100px; z-index:0;
+    transition: transform 0.4s cubic-bezier(0.34,1.56,0.64,1);
+  }
+  .auth-toggle-btn{
+    position:relative; z-index:1; flex:1; text-align:center; font-size:13px; font-weight:600; padding:9px 0;
+    border-radius:100px; color:var(--label-2); transition: color 0.3s ease;
+  }
+  .auth-toggle-btn.active{ color:#000; }
+
+  .auth-form-wrap{ position:relative; }
+  .auth-form{ display:none; }
+  .auth-form.active{ display:block; animation: authFormIn 0.4s cubic-bezier(0.32,0.72,0,1); }
+  @keyframes authFormIn{
+    0%{ opacity:0; transform:translateY(8px) scale(0.98); }
+    100%{ opacity:1; transform:translateY(0) scale(1); }
+  }
   .login-card h1{ font-size:22px; margin-bottom:6px; }
   .login-card .subhead{margin-bottom:20px;}
 
@@ -189,7 +246,7 @@
 </div>
 
 <!-- ═══ 1. CHOIX DE L'ESPACE ═══ -->
-<div class="login-wrap" id="choice-screen">
+<div class="login-wrap" id="choice-screen" style="display:none;">
   <div class="login-card" style="text-align:center;">
     <div class="brand" style="justify-content:center; margin-bottom:14px;">
       <span class="mark">
@@ -214,37 +271,50 @@
     <h1 id="auth-title">Espace Gestion</h1>
     <div class="subhead">Connectez-vous ou créez votre compte</div>
 
-    <div class="view-toggle" style="display:flex; gap:3px; background:var(--bg-card); border:0.5px solid var(--border); border-radius:100px; padding:4px; margin-bottom:20px;">
-      <button id="tab-login-btn" style="flex:1; text-align:center; font-size:13px; font-weight:600; padding:8px 0; border-radius:100px; background:#fff; color:#000;" onclick="switchAuthTab('login')">Se connecter</button>
-      <button id="tab-signup-btn" style="flex:1; text-align:center; font-size:13px; font-weight:600; padding:8px 0; border-radius:100px; color:var(--label-2);" onclick="switchAuthTab('signup')">Créer un compte</button>
+    <div class="auth-toggle">
+      <div class="auth-toggle-indicator" id="auth-indicator"></div>
+      <button id="tab-login-btn" class="auth-toggle-btn active" onclick="switchAuthTab('login')">Se connecter</button>
+      <button id="tab-signup-btn" class="auth-toggle-btn" onclick="switchAuthTab('signup')">Créer un compte</button>
     </div>
 
-    <!-- Connexion -->
-    <div id="login-form">
-      <label class="f">E-mail</label>
-      <input type="email" id="login-email" placeholder="vous@entreprise.com" style="margin-bottom:12px;">
-      <label class="f">Mot de passe</label>
-      <input type="password" id="login-password" placeholder="••••••••" style="margin-bottom:16px;">
-      <button class="btn block" id="login-btn">Se connecter</button>
-    </div>
-
-    <!-- Inscription -->
-    <div id="signup-form" style="display:none;">
-      <div style="display:flex; gap:8px; margin-bottom:12px;">
-        <div style="flex:1;">
-          <label class="f">Prénom</label>
-          <input type="text" id="signup-prenom" placeholder="Marie">
-        </div>
-        <div style="flex:1;">
-          <label class="f">Nom</label>
-          <input type="text" id="signup-nom" placeholder="Tissot">
-        </div>
+    <div class="auth-form-wrap">
+      <!-- Connexion -->
+      <div id="login-form" class="auth-form active">
+        <label class="f">E-mail</label>
+        <input type="email" id="login-email" placeholder="vous@entreprise.com" style="margin-bottom:12px;">
+        <label class="f">Mot de passe</label>
+        <input type="password" id="login-password" placeholder="••••••••" style="margin-bottom:16px;">
+        <button class="btn block" id="login-btn">Se connecter</button>
       </div>
-      <label class="f">E-mail</label>
-      <input type="email" id="signup-email" placeholder="vous@entreprise.com" style="margin-bottom:12px;">
-      <label class="f">Mot de passe</label>
-      <input type="password" id="signup-password" placeholder="••••••••" style="margin-bottom:16px;">
-      <button class="btn block" id="signup-btn">Créer mon compte</button>
+
+      <!-- Inscription -->
+      <div id="signup-form" class="auth-form">
+        <div style="display:flex; gap:8px; margin-bottom:12px;">
+          <div style="flex:1;">
+            <label class="f">Prénom</label>
+            <input type="text" id="signup-prenom" placeholder="Marie">
+          </div>
+          <div style="flex:1;">
+            <label class="f">Nom</label>
+            <input type="text" id="signup-nom" placeholder="Tissot">
+          </div>
+        </div>
+        <label class="f">E-mail</label>
+        <input type="email" id="signup-email" placeholder="vous@entreprise.com" style="margin-bottom:12px;">
+        <label class="f">Mot de passe</label>
+        <input type="password" id="signup-password" placeholder="••••••••" style="margin-bottom:16px;">
+
+        <div id="signup-gestion-field">
+          <label class="f">Nom de l'entreprise</label>
+          <input type="text" id="signup-entreprise-nom" placeholder="Ex : Le Petit Bistrot" style="margin-bottom:16px;">
+        </div>
+        <div id="signup-equipe-field" style="display:none;">
+          <label class="f">Code de l'entreprise (5 chiffres)</label>
+          <input type="text" id="signup-code-acces" placeholder="12345" maxlength="5" inputmode="numeric" style="margin-bottom:16px; letter-spacing:0.3em; text-align:center; font-weight:700;">
+        </div>
+
+        <button class="btn block" id="signup-btn">Créer mon compte</button>
+      </div>
     </div>
 
     <div class="error-msg" id="login-error"></div>
@@ -254,14 +324,17 @@
 <!-- ═══════════════ ESPACE GESTION ═══════════════ -->
 <div class="app" id="gestion-app" style="display:none;">
   <div class="topbar">
-    <div class="brand">
-      <span class="mark">
-        <svg viewBox="0 0 85 100" fill="none">
-          <path d="M 65.78 3.86 L 60.26 1.43 L 53.42 0.00 L 1.77 0.00 L 0.00 1.32 L 0.00 6.62 L 2.10 13.69 L 6.18 19.87 L 11.15 23.95 L 20.31 26.82 L 52.10 27.04 L 56.51 29.80 L 58.50 34.77 L 57.17 40.51 L 53.20 43.71 L 23.18 44.70 L 15.56 47.90 L 9.38 53.42 L 5.63 59.93 L 3.86 67.44 L 3.75 96.91 L 4.97 99.34 L 8.28 100.00 L 15.12 99.34 L 19.76 97.13 L 23.62 93.60 L 27.59 85.10 L 28.04 70.97 L 54.19 70.97 L 60.71 69.76 L 70.86 64.46 L 78.81 55.74 L 82.34 48.57 L 84.11 41.50 L 84.44 34.22 L 83.22 26.27 L 80.57 19.21 L 77.37 14.02 L 71.96 8.17 Z" fill="white"/>
-        </svg>
-      </span>
+    <div class="logo-pill">
+      <svg viewBox="0 0 85 100" fill="none">
+        <path d="M 65.78 3.86 L 60.26 1.43 L 53.42 0.00 L 1.77 0.00 L 0.00 1.32 L 0.00 6.62 L 2.10 13.69 L 6.18 19.87 L 11.15 23.95 L 20.31 26.82 L 52.10 27.04 L 56.51 29.80 L 58.50 34.77 L 57.17 40.51 L 53.20 43.71 L 23.18 44.70 L 15.56 47.90 L 9.38 53.42 L 5.63 59.93 L 3.86 67.44 L 3.75 96.91 L 4.97 99.34 L 8.28 100.00 L 15.12 99.34 L 19.76 97.13 L 23.62 93.60 L 27.59 85.10 L 28.04 70.97 L 54.19 70.97 L 60.71 69.76 L 70.86 64.46 L 78.81 55.74 L 82.34 48.57 L 84.11 41.50 L 84.44 34.22 L 83.22 26.27 L 80.57 19.21 L 77.37 14.02 L 71.96 8.17 Z" fill="white"/>
+      </svg>
     </div>
-    <span class="role-tag">Espace Gestion</span>
+    <div class="topbar-right">
+      <span class="role-tag">Espace Gestion</span>
+      <button class="icon-pill" onclick="openSettings()" aria-label="Paramètres">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+      </button>
+    </div>
   </div>
 
   <div class="screen active" id="p-list">
@@ -340,6 +413,87 @@
       </div>
     </div>
   </div>
+
+  <!-- Analyse générale du compte -->
+  <div class="screen" id="p-global-analyse">
+    <h1 class="pagehead">Analyse générale</h1>
+    <div class="subhead">Vue d'ensemble de votre entreprise</div>
+
+    <div class="hero-card">
+      <div class="lbl">Taux de conformité global</div>
+      <div class="num" id="ga-taux-global">—</div>
+      <div class="sub" id="ga-sub-global">—</div>
+      <div class="bar"><div class="bar-fill" id="ga-bar-global" style="width:0%;"></div></div>
+    </div>
+
+    <div class="stats-row">
+      <div class="stat-mini"><div class="num" id="ga-nb-procedures">—</div><div class="lbl">Procédures</div></div>
+      <div class="stat-mini"><div class="num" id="ga-nb-membres">—</div><div class="lbl">Membres</div></div>
+      <div class="stat-mini"><div class="num" id="ga-nb-validations">—</div><div class="lbl">Validations</div></div>
+    </div>
+
+    <div class="section-title">Procédures les plus en retard</div>
+    <div id="ga-late-list"></div>
+
+    <div class="section-title">Membres les plus à jour</div>
+    <div id="ga-top-membres"></div>
+  </div>
+
+  <!-- Paramètres -->
+  <div class="screen" id="p-settings">
+    <div class="detail-header">
+      <button class="back-btn" onclick="showGestionScreen('p-list')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+      </button>
+      <h1 class="pagehead" style="margin:0; font-size:20px;">Paramètres</h1>
+    </div>
+    <div class="subhead">Votre compte et votre abonnement</div>
+
+    <div class="section-title">Informations personnelles</div>
+    <div class="card">
+      <label class="f">Nom complet</label>
+      <input type="text" id="settings-nom" style="margin-bottom:12px;">
+      <label class="f">Poste</label>
+      <input type="text" id="settings-poste" placeholder="Ex : Manager" style="margin-bottom:12px;">
+      <label class="f">E-mail</label>
+      <input type="text" id="settings-email" disabled style="opacity:0.6;">
+      <button class="btn ghost block" style="margin-top:14px;" id="settings-save-btn">Enregistrer</button>
+      <div class="error-msg" id="settings-error"></div>
+    </div>
+
+    <div class="section-title">Code d'invitation équipe</div>
+    <div class="card" style="text-align:center;">
+      <div style="font-size:12px; color:var(--label-2); margin-bottom:10px;">Partagez ce code à votre équipe pour qu'elle puisse créer son compte et accéder aux procédures</div>
+      <div id="settings-code" style="font-size:32px; font-weight:800; letter-spacing:0.3em; margin:8px 0 14px;">—</div>
+      <button class="btn ghost block" id="copy-code-btn">Copier le code</button>
+    </div>
+
+    <div class="section-title">Votre abonnement</div>
+    <div class="plan-card" data-plan="starter">
+      <div class="plan-head">
+        <div class="plan-name">Starter</div>
+        <div class="plan-price">49€<span>/mois</span></div>
+      </div>
+      <div class="plan-desc">Jusqu'à 10 membres · fonctionnalités essentielles</div>
+    </div>
+    <div class="plan-card active" data-plan="pro">
+      <div class="plan-head">
+        <div class="plan-name">Pro <span class="badge ok" style="margin-left:6px;">Actuel</span></div>
+        <div class="plan-price">99€<span>/mois</span></div>
+      </div>
+      <div class="plan-desc">Jusqu'à 25 membres · IA incluse · vérification vidéo</div>
+    </div>
+    <div class="plan-card" data-plan="business">
+      <div class="plan-head">
+        <div class="plan-name">Business</div>
+        <div class="plan-price">199€<span>/mois</span></div>
+      </div>
+      <div class="plan-desc">Membres illimités · multi-sites</div>
+    </div>
+
+    <div class="section-title">Compte</div>
+    <button class="btn ghost block" id="logout-btn" style="color:var(--red);">Se déconnecter</button>
+  </div>
 </div>
 
 <nav class="tabbar" id="tabbar-gestion" style="display:none;">
@@ -349,6 +503,10 @@
   </button>
   <button class="tab-round tab-round--primary" onclick="showGestionScreen('p-create', this)">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+  </button>
+  <button class="tab-round tab-round--secondary tab-round--with-label" onclick="showGestionScreen('p-global-analyse', this); loadGlobalAnalyse()">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/></svg>
+    <span class="tab-round-label">Analyse</span>
   </button>
 </nav>
 
@@ -440,6 +598,8 @@ window.chooseSpace = function(space) {
   document.getElementById('choice-screen').style.display = 'none'
   document.getElementById('login-screen').style.display = 'flex'
   document.getElementById('auth-title').textContent = space === 'gestion' ? 'Espace Gestion' : 'Espace Équipe'
+  document.getElementById('signup-gestion-field').style.display = space === 'gestion' ? 'block' : 'none'
+  document.getElementById('signup-equipe-field').style.display = space === 'equipe' ? 'block' : 'none'
   switchAuthTab('login')
   document.getElementById('login-error').textContent = ''
 }
@@ -452,13 +612,20 @@ window.backToChoice = function() {
 window.switchAuthTab = function(tab) {
   const loginBtn = document.getElementById('tab-login-btn')
   const signupBtn = document.getElementById('tab-signup-btn')
-  document.getElementById('login-form').style.display = tab === 'login' ? 'block' : 'none'
-  document.getElementById('signup-form').style.display = tab === 'signup' ? 'block' : 'none'
-  loginBtn.style.background = tab === 'login' ? '#fff' : 'none'
-  loginBtn.style.color = tab === 'login' ? '#000' : 'var(--label-2)'
-  signupBtn.style.background = tab === 'signup' ? '#fff' : 'none'
-  signupBtn.style.color = tab === 'signup' ? '#000' : 'var(--label-2)'
+  const indicator = document.getElementById('auth-indicator')
+  const loginForm = document.getElementById('login-form')
+  const signupForm = document.getElementById('signup-form')
+
+  indicator.style.transform = tab === 'login' ? 'translateX(0%)' : 'translateX(100%)'
+  loginBtn.classList.toggle('active', tab === 'login')
+  signupBtn.classList.toggle('active', tab === 'signup')
+
+  loginForm.classList.remove('active')
+  signupForm.classList.remove('active')
+  if (tab === 'login') { loginForm.classList.add('active') } else { signupForm.classList.add('active') }
+
   document.getElementById('login-error').textContent = ''
+  document.getElementById('login-error').style.color = 'var(--red)'
 }
 
 // ═══ CONNEXION ═══
@@ -488,11 +655,29 @@ document.getElementById('signup-btn').addEventListener('click', async () => {
   const nom = document.getElementById('signup-nom').value.trim()
   const email = document.getElementById('signup-email').value.trim()
   const password = document.getElementById('signup-password').value
+  const entrepriseNom = document.getElementById('signup-entreprise-nom').value.trim()
+  const codeAcces = document.getElementById('signup-code-acces').value.trim()
   const errorEl = document.getElementById('login-error')
   errorEl.textContent = ''
+  errorEl.style.color = 'var(--red)'
 
   if (!prenom || !nom) { errorEl.textContent = 'Merci de renseigner votre prénom et votre nom.'; return }
   if (!email || !password) { errorEl.textContent = 'E-mail et mot de passe obligatoires.'; return }
+  if (password.length < 6) { errorEl.textContent = 'Le mot de passe doit faire au moins 6 caractères.'; return }
+  if (selectedSpace === 'gestion' && !entrepriseNom) { errorEl.textContent = "Merci d'indiquer le nom de votre entreprise."; return }
+  if (selectedSpace === 'equipe' && !/^\d{5}$/.test(codeAcces)) { errorEl.textContent = 'Le code entreprise doit contenir exactement 5 chiffres.'; return }
+
+  // Pour l'équipe : vérifier que le code correspond bien à une entreprise AVANT de créer le compte
+  let targetEntrepriseId = null
+  if (selectedSpace === 'equipe') {
+    const { data: entreprise, error: entrepriseError } = await supabase
+      .from('entreprises').select('id').eq('code_acces', codeAcces).maybeSingle()
+    if (entrepriseError || !entreprise) {
+      errorEl.textContent = "Ce code entreprise n'existe pas. Vérifiez-le auprès de votre gestionnaire."
+      return
+    }
+    targetEntrepriseId = entreprise.id
+  }
 
   const signupBtn = document.getElementById('signup-btn')
   signupBtn.disabled = true
@@ -501,7 +686,11 @@ document.getElementById('signup-btn').addEventListener('click', async () => {
   const { data, error } = await supabase.auth.signUp({ email, password })
 
   if (error) {
-    errorEl.textContent = "Erreur : " + error.message
+    if (error.message.includes('already registered') || error.message.includes('already exists')) {
+      errorEl.textContent = "Un compte existe déjà avec cet e-mail. Utilisez plutôt l'onglet Se connecter."
+    } else {
+      errorEl.textContent = "Erreur (" + (error.status || '?') + ") : " + error.message
+    }
     signupBtn.disabled = false; signupBtn.textContent = 'Créer mon compte'
     return
   }
@@ -516,13 +705,32 @@ document.getElementById('signup-btn').addEventListener('click', async () => {
     return
   }
 
-  // Créer la fiche membre liée à ce compte, avec le rôle choisi sur le premier écran
+  if (selectedSpace === 'gestion') {
+    // Créer une nouvelle entreprise avec un code d'accès unique à 5 chiffres
+    let entrepriseId = null
+    for (let tentative = 0; tentative < 5 && !entrepriseId; tentative++) {
+      const code = String(Math.floor(10000 + Math.random() * 90000))
+      const { data: nouvelleEntreprise, error: entrepriseError } = await supabase
+        .from('entreprises').insert({ nom: entrepriseNom, code_acces: code }).select().single()
+      if (!entrepriseError) entrepriseId = nouvelleEntreprise.id
+      // si erreur (code déjà pris), on boucle et retente avec un autre code
+    }
+    if (!entrepriseId) {
+      errorEl.textContent = "Impossible de créer l'entreprise, réessayez."
+      signupBtn.disabled = false; signupBtn.textContent = 'Créer mon compte'
+      return
+    }
+    targetEntrepriseId = entrepriseId
+  }
+
+  // Créer la fiche membre liée à ce compte, avec le rôle choisi et l'entreprise correspondante
   const { data: membre, error: membreError } = await supabase
     .from('membres')
     .insert({
       user_id: data.user.id,
       nom: `${prenom} ${nom}`,
-      role: selectedSpace
+      role: selectedSpace,
+      entreprise_id: targetEntrepriseId
     })
     .select().single()
 
@@ -554,6 +762,137 @@ function enterApp(membre) {
       const params = new URLSearchParams(window.location.search)
       const procId = params.get('proc')
       if (procId) openEquipeDetail(procId)
+    })
+  }
+}
+
+// ═══ PARAMÈTRES ═══
+window.openSettings = async function() {
+  showGestionScreen('p-settings')
+  document.getElementById('settings-nom').value = currentMembre.nom || ''
+  document.getElementById('settings-poste').value = currentMembre.poste || ''
+  const { data: userData } = await supabase.auth.getUser()
+  document.getElementById('settings-email').value = userData?.user?.email || ''
+
+  const { data: entreprise } = await supabase
+    .from('entreprises').select('code_acces').eq('id', currentMembre.entreprise_id).maybeSingle()
+  document.getElementById('settings-code').textContent = entreprise?.code_acces || '—'
+}
+
+document.getElementById('copy-code-btn').addEventListener('click', () => {
+  const code = document.getElementById('settings-code').textContent
+  if (code && code !== '—') {
+    navigator.clipboard.writeText(code)
+    const btn = document.getElementById('copy-code-btn')
+    const original = btn.textContent
+    btn.textContent = 'Copié !'
+    setTimeout(() => { btn.textContent = original }, 1500)
+  }
+})
+
+document.getElementById('settings-save-btn').addEventListener('click', async () => {
+  const errorEl = document.getElementById('settings-error')
+  errorEl.textContent = ''
+  const nom = document.getElementById('settings-nom').value.trim()
+  const poste = document.getElementById('settings-poste').value.trim()
+  if (!nom) { errorEl.textContent = 'Le nom est obligatoire.'; return }
+
+  const { error } = await supabase.from('membres').update({ nom, poste }).eq('id', currentMembre.id)
+  if (error) { errorEl.textContent = "Erreur : " + error.message; return }
+  currentMembre.nom = nom
+  currentMembre.poste = poste
+  errorEl.style.color = 'var(--green)'
+  errorEl.textContent = 'Enregistré.'
+})
+
+document.querySelectorAll('.plan-card').forEach(card => {
+  card.addEventListener('click', () => {
+    document.querySelectorAll('.plan-card').forEach(c => c.classList.remove('active'))
+    card.classList.add('active')
+  })
+})
+
+document.getElementById('logout-btn').addEventListener('click', async () => {
+  await supabase.auth.signOut()
+  currentMembre = null
+  document.getElementById('gestion-app').style.display = 'none'
+  document.getElementById('equipe-app').style.display = 'none'
+  document.getElementById('tabbar-gestion').style.display = 'none'
+  document.getElementById('tabbar-equipe').style.display = 'none'
+  document.getElementById('login-email').value = ''
+  document.getElementById('login-password').value = ''
+  document.getElementById('choice-screen').style.display = 'flex'
+})
+
+// ═══ ANALYSE GÉNÉRALE ═══
+window.loadGlobalAnalyse = async function() {
+  const { data: procedures } = await supabase.from('procedures').select('*').eq('entreprise_id', currentMembre.entreprise_id)
+  const { data: membres } = await supabase.from('membres').select('*').eq('entreprise_id', currentMembre.entreprise_id)
+  const { data: assignations } = await supabase.from('assignations').select('*').in('procedure_id', (procedures||[]).map(p=>p.id))
+  const { data: validations } = await supabase.from('validations').select('*').in('procedure_id', (procedures||[]).map(p=>p.id))
+
+  const nbProcedures = procedures?.length || 0
+  const nbMembres = membres?.length || 0
+  const nbAssignations = assignations?.length || 0
+  const nbValidations = validations?.length || 0
+  const taux = nbAssignations > 0 ? Math.round((nbValidations / nbAssignations) * 100) : 0
+
+  document.getElementById('ga-taux-global').textContent = taux + '%'
+  document.getElementById('ga-sub-global').textContent = `${nbValidations} validations sur ${nbAssignations} attendues`
+  document.getElementById('ga-bar-global').style.width = taux + '%'
+  document.getElementById('ga-nb-procedures').textContent = nbProcedures
+  document.getElementById('ga-nb-membres').textContent = nbMembres
+  document.getElementById('ga-nb-validations').textContent = nbValidations
+
+  // Procédures les plus en retard (le moins de validations par rapport aux assignations)
+  const lateListEl = document.getElementById('ga-late-list')
+  lateListEl.innerHTML = ''
+  const procStats = (procedures || []).map(proc => {
+    const assignes = (assignations || []).filter(a => a.procedure_id === proc.id).length
+    const valides = (validations || []).filter(v => v.procedure_id === proc.id).length
+    const ratio = assignes > 0 ? valides / assignes : 1
+    return { proc, assignes, valides, ratio }
+  }).filter(s => s.assignes > 0).sort((a,b) => a.ratio - b.ratio).slice(0, 3)
+
+  if (procStats.length === 0) {
+    lateListEl.innerHTML = '<div class="note">Aucune procédure assignée pour le moment.</div>'
+  } else {
+    procStats.forEach((s, i) => {
+      const div = document.createElement('div')
+      div.className = 'sop-card'
+      div.style.animationDelay = (i * 0.05) + 's'
+      div.innerHTML = `
+        <div>
+          <div class="title">${escapeHtml(s.proc.titre)}</div>
+          <div class="meta">${s.valides}/${s.assignes} validations</div>
+        </div>
+        <span class="badge ${s.ratio >= 0.8 ? 'ok' : 'pending'}">${Math.round(s.ratio*100)}%</span>
+      `
+      lateListEl.appendChild(div)
+    })
+  }
+
+  // Membres les plus à jour
+  const topMembresEl = document.getElementById('ga-top-membres')
+  topMembresEl.innerHTML = ''
+  const membreStats = (membres || []).map(m => {
+    const validCount = (validations || []).filter(v => v.membre_id === m.id).length
+    return { m, validCount }
+  }).sort((a,b) => b.validCount - a.validCount).slice(0, 5)
+
+  if (membreStats.length === 0) {
+    topMembresEl.innerHTML = '<div class="note">Aucun membre pour le moment.</div>'
+  } else {
+    membreStats.forEach((s, i) => {
+      const div = document.createElement('div')
+      div.className = 'emp-row'
+      div.style.animationDelay = (i * 0.05) + 's'
+      div.innerHTML = `
+        <div class="check done"></div>
+        <div class="emp-row-name">${escapeHtml(s.m.nom)}</div>
+        <div class="emp-row-date">${s.validCount} validation${s.validCount>1?'s':''}</div>
+      `
+      topMembresEl.appendChild(div)
     })
   }
 }
@@ -922,6 +1261,21 @@ function escapeHtml(str) {
   div.textContent = str || ''
   return div.innerHTML
 }
+
+// ═══ RESTER CONNECTÉ : vérifie s'il existe déjà une session au chargement ═══
+;(async function checkExistingSession() {
+  const { data: { session } } = await supabase.auth.getSession()
+  if (session) {
+    const { data: membre, error } = await supabase
+      .from('membres').select('*').eq('user_id', session.user.id).maybeSingle()
+    if (membre) {
+      enterApp(membre)
+      return
+    }
+  }
+  // Pas de session valide : afficher l'écran de choix d'espace
+  document.getElementById('choice-screen').style.display = 'flex'
+})()
 </script>
 
 </body>
