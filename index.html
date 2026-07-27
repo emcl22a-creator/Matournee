@@ -39,7 +39,7 @@
   @keyframes chaloBreath3{0%,100%{transform:translateX(-50%) scale(1); opacity:0.8;}50%{transform:translateX(-50%) scale(1.15); opacity:1;}}
 
   .app{ position:relative; z-index:1; width:100%; max-width:460px; margin:0 auto; min-height:100vh; padding-bottom:120px; }
-  .topbar{ position:sticky; top:0; z-index:15; padding:16px 20px 12px; }
+  .topbar{ position:fixed; top:0; left:50%; transform:translateX(-50%); width:100%; max-width:460px; z-index:15; padding:16px 20px 0; }
   .brand .mark svg{ width:26px; height:29px; animation: logoBreath 4s ease-in-out infinite; }
   @keyframes logoBreath{
     0%,100%{ transform:scale(1); }
@@ -47,25 +47,41 @@
   }
 
   .topbar-card{
+    position:relative; overflow:hidden; isolation:isolate;
     display:flex; align-items:center; justify-content:space-between; gap:10px;
+    background:
+      linear-gradient(180deg, rgba(255,255,255,0.16), rgba(255,255,255,0.03) 55%),
+      rgba(255,255,255,0.05);
+    -webkit-backdrop-filter:blur(20px) saturate(180%); backdrop-filter:blur(20px) saturate(180%);
+    border:0.5px solid rgba(255,255,255,0.18); border-radius:100px; padding:8px 8px 8px 16px;
+    box-shadow:
+      0 1px 1px rgba(255,255,255,0.25) inset,
+      0 -6px 10px rgba(0,0,0,0.25) inset,
+      0 8px 20px rgba(0,0,0,0.30);
   }
-  .topbar-left{ display:flex; align-items:center; gap:12px; }
+  .topbar-card::before{
+    content:''; position:absolute; top:-45%; left:6%; width:46%; height:85%;
+    background:radial-gradient(ellipse at 50% 0%, rgba(255,255,255,0.4), rgba(255,255,255,0) 65%);
+    transform:rotate(-8deg); pointer-events:none; z-index:1;
+  }
+  .topbar-left{ display:flex; align-items:center; gap:12px; position:relative; z-index:2; }
   .logo-pill{
     display:flex; align-items:center; justify-content:center; flex-shrink:0;
   }
-  .logo-pill svg{ width:22px; height:26px; }
+  .logo-pill svg{ width:20px; height:24px; }
   .topbar-title{ display:flex; flex-direction:column; line-height:1.2; }
-  .topbar-title .name{ font-size:15.5px; font-weight:700; }
-  .topbar-title .role{ font-size:12px; color:var(--label-2); font-weight:500; }
+  .topbar-title .name{ font-size:14.5px; font-weight:700; }
+  .topbar-title .role{ font-size:11.5px; color:var(--label-2); font-weight:500; }
   .icon-pill{
-    width:40px; height:40px; border-radius:50%; display:flex; align-items:center; justify-content:center; flex-shrink:0;
-    background:rgba(255,255,255,0.07); border:0.5px solid var(--border); color:var(--label);
+    width:38px; height:38px; border-radius:50%; display:flex; align-items:center; justify-content:center; flex-shrink:0;
+    background:rgba(255,255,255,0.10); border:0.5px solid rgba(255,255,255,0.16); color:var(--label);
+    position:relative; z-index:2;
     transition: transform 0.18s cubic-bezier(0.34,1.56,0.64,1), background 0.2s;
   }
-  .icon-pill:active{ transform:scale(0.88); background:rgba(255,255,255,0.16); }
-  .icon-pill svg{ width:18px; height:18px; }
+  .icon-pill:active{ transform:scale(0.88); background:rgba(255,255,255,0.2); }
+  .icon-pill svg{ width:17px; height:17px; }
 
-  .screen{display:none; padding:0 20px 40px;}
+  .screen{display:none; padding:86px 20px 40px;}
   .screen.active{ display:block; animation: screenIn 0.5s cubic-bezier(0.32,0.72,0,1); }
   @keyframes screenIn{
     0%{ opacity:0; transform:translateY(14px) scale(0.985); }
@@ -173,7 +189,7 @@
   .detail-step p{font-size:14px; line-height:1.4;}
   .confirm-bar{ margin-top:20px; }
 
-  .search-bar{ display:flex; align-items:center; gap:8px; background:var(--bg-card); border:0.5px solid var(--border); border-radius:100px; padding:5px 14px; margin-bottom:14px; }
+  .search-bar{ display:flex; align-items:center; gap:8px; background:var(--bg-card); border:0.5px solid var(--border); border-radius:100px; padding:2px 14px; margin-bottom:14px; }
   .search-bar svg{width:15px; height:15px; color:var(--label-2); flex-shrink:0;}
   .search-bar input{background:none; border:none; font-size:16px; width:100%;}
 
@@ -193,6 +209,13 @@
   .error-msg{ font-size:13px; color:var(--red); margin-top:8px; }
 
   .login-wrap{ position:fixed; inset:0; display:flex; align-items:center; justify-content:center; padding:24px; overflow:hidden; touch-action:none; }
+
+  .spinner{
+    width:22px; height:22px; border-radius:50%;
+    border:2.5px solid rgba(255,255,255,0.2); border-top-color:#fff;
+    animation: spin 0.8s linear infinite;
+  }
+  @keyframes spin{ to{ transform:rotate(360deg); } }
   .login-card{ width:100%; max-width:360px; max-height:92vh; overflow-y:auto; background:var(--bg-card); border:0.5px solid var(--border); border-radius:20px; padding:28px 24px;
     -webkit-backdrop-filter:blur(20px) saturate(180%); backdrop-filter:blur(20px) saturate(180%); touch-action:pan-y; }
 
@@ -240,6 +263,16 @@
 
 <div class="color-halos">
   <div class="chalo chalo-4"></div><div class="chalo chalo-1"></div><div class="chalo chalo-2"></div>
+</div>
+
+<!-- ═══ 0. CHARGEMENT (le temps de vérifier si déjà connecté) ═══ -->
+<div class="login-wrap" id="loading-screen">
+  <div style="display:flex; flex-direction:column; align-items:center; gap:16px;">
+    <svg viewBox="0 0 85 100" fill="none" style="width:32px; height:38px; opacity:0.9;">
+      <path d="M 65.78 3.86 L 60.26 1.43 L 53.42 0.00 L 1.77 0.00 L 0.00 1.32 L 0.00 6.62 L 2.10 13.69 L 6.18 19.87 L 11.15 23.95 L 20.31 26.82 L 52.10 27.04 L 56.51 29.80 L 58.50 34.77 L 57.17 40.51 L 53.20 43.71 L 23.18 44.70 L 15.56 47.90 L 9.38 53.42 L 5.63 59.93 L 3.86 67.44 L 3.75 96.91 L 4.97 99.34 L 8.28 100.00 L 15.12 99.34 L 19.76 97.13 L 23.62 93.60 L 27.59 85.10 L 28.04 70.97 L 54.19 70.97 L 60.71 69.76 L 70.86 64.46 L 78.81 55.74 L 82.34 48.57 L 84.11 41.50 L 84.44 34.22 L 83.22 26.27 L 80.57 19.21 L 77.37 14.02 L 71.96 8.17 Z" fill="white"/>
+    </svg>
+    <div class="spinner"></div>
+  </div>
 </div>
 
 <!-- ═══ 1. CHOIX DE L'ESPACE ═══ -->
@@ -755,6 +788,7 @@ document.getElementById('signup-btn').addEventListener('click', async () => {
 
 function enterApp(membre) {
   currentMembre = membre
+  document.getElementById('loading-screen').style.display = 'none'
   document.getElementById('login-screen').style.display = 'none'
   document.getElementById('choice-screen').style.display = 'none'
 
@@ -1307,20 +1341,23 @@ try {
       console.error('Erreur de vérification de session :', e)
     }
     // Pas de session valide (ou erreur) : afficher l'écran de choix d'espace
+    document.getElementById('loading-screen').style.display = 'none'
     document.getElementById('choice-screen').style.display = 'flex'
     window.__procedoLoaded = true
   })()
 } catch (e) {
   console.error('Erreur au chargement :', e)
+  document.getElementById('loading-screen').style.display = 'none'
   document.getElementById('choice-screen').style.display = 'flex'
 }
 </script>
 
 <!-- Filet de sécurité : si le script principal (module) échoue à charger
-     (réseau, bloqueur de pub, etc.), on force l'affichage après 4 secondes -->
+     (réseau, bloqueur de pub, etc.) ou prend trop de temps, on force l'affichage -->
 <script>
   setTimeout(function() {
     if (!window.__procedoLoaded) {
+      var loading = document.getElementById('loading-screen')
       var choice = document.getElementById('choice-screen')
       var login = document.getElementById('login-screen')
       var gestion = document.getElementById('gestion-app')
@@ -1329,10 +1366,11 @@ try {
       var gestionVisible = gestion && gestion.style.display === 'block'
       var equipeVisible = equipe && equipe.style.display === 'block'
       if (!loginVisible && !gestionVisible && !equipeVisible && choice) {
+        if (loading) loading.style.display = 'none'
         choice.style.display = 'flex'
       }
     }
-  }, 4000)
+  }, 6000)
 </script>
 
 </body>
