@@ -206,6 +206,30 @@
   .scan-result .icon svg{width:20px; height:20px; color:#000;}
 
   .note{ font-size:12.5px; color:var(--label-2); margin-top:14px; }
+
+  .empty-state{ text-align:center; padding:36px 20px 20px; }
+  .empty-state .glow-icon{
+    position:relative; width:72px; height:72px; margin:0 auto 20px;
+    display:flex; align-items:center; justify-content:center;
+    border-radius:50%;
+    background:
+      linear-gradient(180deg, rgba(255,255,255,0.16), rgba(255,255,255,0.02) 60%),
+      rgba(255,255,255,0.05);
+    border:0.5px solid rgba(255,255,255,0.16);
+    box-shadow:
+      0 1px 1px rgba(255,255,255,0.2) inset,
+      0 -6px 12px rgba(0,0,0,0.25) inset,
+      0 0 30px rgba(255,255,255,0.08);
+  }
+  .empty-state .glow-icon svg{ width:30px; height:30px; color:#fff; opacity:0.9; }
+  .empty-state .plus-badge{
+    position:absolute; bottom:-2px; right:-2px; width:26px; height:26px; border-radius:50%;
+    background:#fff; display:flex; align-items:center; justify-content:center;
+    box-shadow:0 3px 8px rgba(0,0,0,0.3);
+  }
+  .empty-state .plus-badge svg{ width:13px; height:13px; color:#000; }
+  .empty-state h3{ font-size:16px; font-weight:700; margin-bottom:6px; }
+  .empty-state p{ font-size:13px; color:var(--label-2); max-width:250px; margin:0 auto; line-height:1.5; }
   .error-msg{ font-size:13px; color:var(--red); margin-top:8px; }
 
   .login-wrap{ position:fixed; inset:0; display:flex; align-items:center; justify-content:center; padding:24px; overflow:hidden; touch-action:none; }
@@ -988,7 +1012,18 @@ async function loadGestionProcedures() {
   subheadEl.textContent = `${procedures.length} procédure${procedures.length > 1 ? 's' : ''} · accès complet`
 
   if (procedures.length === 0) {
-    listEl.innerHTML = '<div class="note">Aucune procédure pour le moment. Créez la première avec le bouton ci-dessus.</div>'
+    listEl.innerHTML = `
+      <div class="empty-state">
+        <div class="glow-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+          <div class="plus-badge">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          </div>
+        </div>
+        <h3>Aucune procédure pour le moment</h3>
+        <p>Créez la première avec le bouton ci-dessus — décrivez la tâche ou filmez-la, ça ne prend que quelques minutes.</p>
+      </div>
+    `
     return
   }
 
